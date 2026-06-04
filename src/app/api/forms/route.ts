@@ -1,0 +1,66 @@
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import authOptions from "@/lib/auth";
+import dbConnect from "@/lib/db";
+import Form from "@/lib/models/Form";
+import { logAction } from "@/lib/audit";
+
+export async function GET() {
+  try {
+    await dbConnect();
+    const session = await getServerSession(authOptions);
+    
+    let forms;
+    if (session?.user) {
+      // Faculty/Admin sees all forms
+      forms = await Form.find({}).sort({ createdAt: -1 });
+    } else {
+      // Unauthenticated sees active forms only
+      forms = await Form.find({ status: "active" }).sort({ createdAt: -1 });
+    }
+
+    return NextResponse.json(forms);
+  } catch (error: any) {
+    console.error("GET Forms error:", error);
+    return NextResponse.json({ error: error.message || "Failed to fetch forms" }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    await dbConnect();
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await req.json();
+    const { title, description, department, batch, academicYear, deadline } = body;
+
+    if (!title || !department || !batch || !academicYear || !deadline) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const form = await Form.create({
+      title,
+      description,
+      department,
+      batch,
+      academicYear,
+      deadline: new Date(deadline),
+      createdBy: (session.user as any).id,
+      status: new Date(deadline) > new Date() ? "active" : "expired",
+    });
+
+    await logAction(
+      "Form Created",
+      `Form "${title}" (${batch} - ${department}) created by ${session.user.email}`,
+      session.user.email || "Faculty"
+    );
+
+    return NextResponse.json(form, { status: 201 });
+  } catch (error: any) {
+    console.error("POST Form error:", error);
+    return NextResponse.json({ error: error.message || "Failed to create form" }, { status: 500 });
+  }
+}

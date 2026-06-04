@@ -1,0 +1,69 @@
+import mongoose from "mongoose";
+
+const FormSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  description: {
+    type: String,
+    trim: true,
+  },
+  department: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  batch: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  academicYear: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  deadline: {
+    type: Date,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ["active", "expired"],
+    default: "active",
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// Middleware to automatically mark expired forms when loading
+FormSchema.post("find", function (docs) {
+  const now = new Date();
+  for (const doc of docs) {
+    if (doc.deadline && new Date(doc.deadline) < now && doc.status !== "expired") {
+      doc.status = "expired";
+      doc.save().catch(() => {}); // silent save
+    }
+  }
+});
+
+FormSchema.post("findOne", function (doc) {
+  if (doc) {
+    const now = new Date();
+    if (doc.deadline && new Date(doc.deadline) < now && doc.status !== "expired") {
+      doc.status = "expired";
+      doc.save().catch(() => {});
+    }
+  }
+});
+
+export default mongoose.models.Form || mongoose.model("Form", FormSchema);

@@ -123,9 +123,9 @@ export default function LoginPage() {
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white mb-5 shadow-[0_0_25px_rgba(139,92,246,0.3)] pulse-glow">
             <Shield className="h-7 w-7" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">CertSync</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-white bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">KJCMT DOC</h1>
           <p className="mt-2 text-sm text-zinc-400">
-            Kristu Jyoti College of Management and Technology
+            a service by Inovus Labs IEDC
           </p>
         </div>
 
@@ -312,7 +312,7 @@ export default function LoginPage() {
           
           <div className="mt-6 border-t border-zinc-800/80 pt-4 text-center">
             <span className="text-xs text-zinc-500">
-              Demo: <code className="text-purple-400 font-mono bg-purple-500/10 px-1 py-0.5 rounded">admin@certsync.com</code> / <code className="text-purple-400 font-mono bg-purple-500/10 px-1 py-0.5 rounded">admin123</code>
+              Demo: <code className="text-purple-400 font-mono bg-purple-500/10 px-1 py-0.5 rounded">admin@kjcmt.edu.in</code> / <code className="text-purple-400 font-mono bg-purple-500/10 px-1 py-0.5 rounded">admin123</code>
             </span>
           </div>
         </div>

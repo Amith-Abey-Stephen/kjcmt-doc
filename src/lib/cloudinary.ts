@@ -46,7 +46,7 @@ export async function uploadCertificate(
   const sanitizedStudent = sanitizeName(studentName);
   const ext = getExtensionFromBuffer(fileBuffer);
   const filename = `${sanitizedStudent}_${index}`;
-  const folderPath = `certsync/form_${formId}`;
+  const folderPath = `kjcmt-doc/form_${formId}`;
   
   if (isCloudinaryConfigured) {
     try {

@@ -9,8 +9,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CertSync - Certificate Tracking & Compilation",
-  description: "Academically aligned, accreditation-ready certificate tracking, collection, and compilation platform for Kistru Jyoti College.",
+  title: "KJCMT DOC - Certificate Tracking & Compilation",
+  description: "Academically aligned, accreditation-ready certificate tracking, collection, and compilation platform for Kristu Jyoti College of Management and Technology.",
 };
 
 export default function RootLayout({

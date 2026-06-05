@@ -10,7 +10,6 @@ import {
   Inbox,
   BarChart3,
   DownloadCloud,
-  Settings,
   LogOut,
   Menu,
   X,
@@ -26,7 +25,7 @@ const sidebarLinks = [
   { name: "Submissions", href: "/dashboard/submissions", icon: Inbox },
   { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
   { name: "Export Center", href: "/dashboard/export", icon: DownloadCloud },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  // { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -179,11 +178,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {/* Logo Branding */}
           <div className="flex items-center px-6 mb-8 gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-sm shadow-lg shadow-purple-600/20">
-              CS
+              KD
             </div>
             <div>
-              <span className="text-lg font-bold tracking-tight text-white">CertSync</span>
-              <p className="text-[8px] text-zinc-600 tracking-wider uppercase">Certificate Portal</p>
+              <span className="text-lg font-bold tracking-tight text-white">KJCMT DOC</span>
+              <p className="text-[8px] text-zinc-600 tracking-wider uppercase">by Inovus Labs IEDC</p>
             </div>
           </div>
 
@@ -254,11 +253,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="md:hidden flex items-center justify-between h-16 w-full fixed top-0 inset-x-0 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-xl px-4 z-30">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-sm shadow-lg">
-            CS
+            KD
           </div>
           <div>
-            <span className="text-md font-bold tracking-tight text-white">CertSync</span>
-            <p className="text-[7px] text-zinc-600 uppercase tracking-wider">Certificate Portal</p>
+            <span className="text-md font-bold tracking-tight text-white">KJCMT DOC</span>
+            <p className="text-[7px] text-zinc-600 uppercase tracking-wider">by Inovus Labs IEDC</p>
           </div>
         </div>
         <button
@@ -307,7 +306,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="hidden md:flex items-center justify-between h-16 border-b border-zinc-900 bg-zinc-950/40 backdrop-blur-xl px-8 sticky top-0 z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-xs text-zinc-500">
-            <span className="text-zinc-600">CertSync</span>
+            <span className="text-zinc-600">KJCMT DOC</span>
             <span className="text-zinc-800">/</span>
             <span className="text-zinc-300 font-medium">
               {sidebarLinks.find((l) => l.href === pathname)?.name || "Dashboard"}
@@ -403,7 +402,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     <p className="font-medium text-white text-[11px]">{session?.user?.name}</p>
                     <p className="text-[9px] text-zinc-500 truncate">{session?.user?.email}</p>
                   </div>
-                  <button
+                  {/* <button
                     onClick={() => {
                       setProfileOpen(false);
                       router.push("/dashboard/settings");
@@ -411,7 +410,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     className="w-full text-left px-4 py-2 text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
                     Account Settings
-                  </button>
+                  </button> */}
                   <button
                     onClick={handleLogout}
                     className="w-full text-left px-4 py-2 text-red-400 hover:bg-red-500/10 transition-colors"

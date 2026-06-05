@@ -24,7 +24,7 @@ export const authOptions: AuthOptions = {
           const hashedPassword = await bcrypt.hash("admin123", 10);
           await User.create({
             name: "Admin Faculty",
-            email: "admin@certsync.com",
+            email: "admin@kjcmt.edu.in",
             password: hashedPassword,
             role: "admin",
           });
@@ -71,6 +71,6 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET || "certsync_secret_secret_123456_key",
+  secret: process.env.NEXTAUTH_SECRET || "kjcmt_doc_secret_secret_123456_key",
 };
 export default authOptions;

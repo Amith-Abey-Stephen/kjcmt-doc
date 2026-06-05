@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
     });
 
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = "CertSync Platform";
+    workbook.creator = "KJCMT DOC Platform";
     workbook.created = new Date();
 
     const worksheet = workbook.addWorksheet(

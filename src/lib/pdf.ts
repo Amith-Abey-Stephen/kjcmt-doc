@@ -96,8 +96,8 @@ export async function mergeAndCompressPdfs(
   const mergedPdf = await PDFDocument.create();
   
   // Set minimal metadata (remove original creator information)
-  mergedPdf.setCreator("CertSync Platform");
-  mergedPdf.setProducer("CertSync PDF Engine");
+  mergedPdf.setCreator("KJCMT DOC Platform");
+  mergedPdf.setProducer("KJCMT DOC PDF Engine");
   mergedPdf.setTitle("Final Certificate Bundle");
 
   let pagesAdded = 0;

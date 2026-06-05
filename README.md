@@ -1,8 +1,8 @@
-# CertSync
+# KJCMT DOC
 
-CertSync is a production-ready, high-performance certificate collection, tracking, and compilation platform designed specifically for educational institutions to collect student certificates, cross-reference submissions against student master registers, and compile accreditation-ready (NAAC/NBA) evidence bundles.
+KJCMT DOC is a production-ready, high-performance certificate collection, tracking, and compilation platform designed specifically for Kristu Jyoti College of Management and Technology to collect student certificates, cross-reference submissions against student master registers, and compile accreditation-ready (NAAC/NBA) evidence bundles.
 
-Developed for **Kristu Jyoti College of Management and Technology** by **INOVUS LABS IEDC**.
+Powered by **INOVUS LABS IEDC**.
 
 ---
 
@@ -62,14 +62,14 @@ Create a `.env.local` file at the root of the project:
 
 ```env
 # MongoDB Atlas Connection
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/certsync
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/kjcmt-doc
 
 # NextAuth Configuration
 NEXTAUTH_SECRET=your-secure-base64-secret-key
 NEXTAUTH_URL=http://localhost:3000
 
 # Cloudinary Integration (Optional for local development)
-# If left blank, CertSync defaults to storing uploads locally under /public/uploads/
+# If left blank, KJCMT DOC defaults to storing uploads locally under /public/uploads/
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
 CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
@@ -92,7 +92,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### 3. Automated Seeding / Admin Setup
 On first startup, trying to log in when the database is empty automatically seeds the default administrator account:
-- **Email**: `admin@certsync.com`
+- **Email**: `admin@kjcmt.edu.in`
 - **Password**: `admin123`
 
 Faculty can log in, create campaigns, upload student lists, track submissions, and invite/register additional staff members through the **Settings** panel.
@@ -119,5 +119,5 @@ Faculty can log in, create campaigns, upload student lists, track submissions, a
 ---
 
 ## 📄 License & Attribution
-Designed and built by **INOVUS LABS IEDC** for **Kristu Jyoti College of Management and Technology**.
+Powered by **INOVUS LABS IEDC** for **Kristu Jyoti College of Management and Technology**.
 All rights reserved.

@@ -377,7 +377,7 @@ export default function StudentForm({ form }: StudentFormProps) {
             <input
               type="text"
               required
-              placeholder="e.g. CertSync Certificate Tracking System"
+              placeholder="e.g. KJCMT DOC Certificate Tracking System"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"

@@ -17,7 +17,7 @@ export async function sendDiscordWebhook(
             color,
             fields,
             timestamp: new Date().toISOString(),
-            footer: { text: "CertSync" },
+            footer: { text: "KJCMT DOC" },
           },
         ],
       }),

@@ -39,6 +39,36 @@ const SubmissionSchema = new mongoose.Schema({
     required: false,
     trim: true,
   },
+  programmeName: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  programmeCode: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  projectType: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  courseCode: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  yearOfOffering: {
+    type: String,
+    required: false,
+    trim: true,
+  },
+  placeOfProject: {
+    type: String,
+    required: false,
+    trim: true,
+  },
   certificate1: {
     type: FileSchema,
     required: true,

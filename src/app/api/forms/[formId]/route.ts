@@ -88,3 +88,53 @@ export async function DELETE(req: Request, props: { params: Promise<{ formId: st
     return NextResponse.json({ error: error.message || "Failed to delete form" }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request, props: { params: Promise<{ formId: string }> }) {
+  const params = await props.params;
+  try {
+    await dbConnect();
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const form = await Form.findById(params.formId);
+    if (!form) {
+      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+    }
+
+    const user = session.user as any;
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return NextResponse.json({ error: "Unauthorized. You do not own this form." }, { status: 403 });
+    }
+
+    const body = await req.json();
+    
+    // Update fields
+    const updatableFields = [
+      "title", "description", "department", "batch", "academicYear", "deadline", "status",
+      "programmeName", "programmeCode", "projectType", "courseCode", "yearOfOffering", "placeOfProject",
+      "askProgrammeName", "askProgrammeCode", "askProjectType", "askCourseCode", "askYearOfOffering", "askPlaceOfProject"
+    ];
+
+    for (const field of updatableFields) {
+      if (body[field] !== undefined) {
+        form[field] = body[field];
+      }
+    }
+
+    await form.save();
+
+    await logAction(
+      "Form Updated",
+      `Form "${form.title}" was updated by ${session.user.email}`,
+      session.user.email || "Faculty",
+      user.id
+    );
+
+    return NextResponse.json(form);
+  } catch (error: any) {
+    console.error("PUT Form error:", error);
+    return NextResponse.json({ error: error.message || "Failed to update form" }, { status: 500 });
+  }
+}

@@ -54,6 +54,12 @@ export async function POST(req: Request) {
       courseCode,
       yearOfOffering,
       placeOfProject,
+      askProgrammeName,
+      askProgrammeCode,
+      askProjectType,
+      askCourseCode,
+      askYearOfOffering,
+      askPlaceOfProject,
     } = body;
 
     if (!title || !department || !batch || !academicYear || !deadline) {
@@ -75,6 +81,12 @@ export async function POST(req: Request) {
       courseCode: courseCode || undefined,
       yearOfOffering: yearOfOffering || undefined,
       placeOfProject: placeOfProject || undefined,
+      askProgrammeName: !!askProgrammeName,
+      askProgrammeCode: !!askProgrammeCode,
+      askProjectType: !!askProjectType,
+      askCourseCode: !!askCourseCode,
+      askYearOfOffering: !!askYearOfOffering,
+      askPlaceOfProject: !!askPlaceOfProject,
     });
 
     await logAction(

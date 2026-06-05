@@ -239,14 +239,14 @@ export async function GET(req: NextRequest) {
         const sub = submissionMap.get(roll);
 
         const row = worksheet.addRow({
-          programmeName: pName,
-          programmeCode: pCode,
-          projectType: projType,
-          courseCode: cCode,
-          yearOfOffering: yOffering,
+          programmeName: sub?.programmeName || pName || "—",
+          programmeCode: sub?.programmeCode || pCode || "—",
+          projectType: sub?.projectType || projType || "Project Work",
+          courseCode: sub?.courseCode || cCode || "—",
+          yearOfOffering: sub?.yearOfOffering || yOffering || "—",
           studentName: student.studentName,
           projectName: sub ? (sub.projectName || "—") : "—",
-          placeOfProject: plProject,
+          placeOfProject: sub?.placeOfProject || plProject || "—",
         });
 
         row.eachCell((cell) => {

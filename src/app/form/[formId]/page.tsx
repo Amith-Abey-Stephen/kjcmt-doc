@@ -24,6 +24,18 @@ async function getFormData(formId: string) {
       academicYear: form.academicYear,
       deadline: form.deadline.toISOString(),
       status: form.status,
+      programmeName: form.programmeName || "",
+      programmeCode: form.programmeCode || "",
+      projectType: form.projectType || "",
+      courseCode: form.courseCode || "",
+      yearOfOffering: form.yearOfOffering || "",
+      placeOfProject: form.placeOfProject || "",
+      askProgrammeName: !!form.askProgrammeName,
+      askProgrammeCode: !!form.askProgrammeCode,
+      askProjectType: !!form.askProjectType,
+      askCourseCode: !!form.askCourseCode,
+      askYearOfOffering: !!form.askYearOfOffering,
+      askPlaceOfProject: !!form.askPlaceOfProject,
     };
   } catch (e) {
     return null;

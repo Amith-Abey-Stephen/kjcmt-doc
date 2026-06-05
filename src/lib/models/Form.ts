@@ -58,6 +58,30 @@ const FormSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  askProgrammeName: {
+    type: Boolean,
+    default: false,
+  },
+  askProgrammeCode: {
+    type: Boolean,
+    default: false,
+  },
+  askProjectType: {
+    type: Boolean,
+    default: false,
+  },
+  askCourseCode: {
+    type: Boolean,
+    default: false,
+  },
+  askYearOfOffering: {
+    type: Boolean,
+    default: false,
+  },
+  askPlaceOfProject: {
+    type: Boolean,
+    default: false,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

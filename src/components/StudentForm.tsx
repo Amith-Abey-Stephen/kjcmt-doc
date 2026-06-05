@@ -22,6 +22,18 @@ interface FormDetails {
   batch: string;
   academicYear: string;
   deadline: string;
+  programmeName?: string;
+  programmeCode?: string;
+  projectType?: string;
+  courseCode?: string;
+  yearOfOffering?: string;
+  placeOfProject?: string;
+  askProgrammeName?: boolean;
+  askProgrammeCode?: boolean;
+  askProjectType?: boolean;
+  askCourseCode?: boolean;
+  askYearOfOffering?: boolean;
+  askPlaceOfProject?: boolean;
 }
 
 interface StudentFormProps {
@@ -35,6 +47,14 @@ export default function StudentForm({ form }: StudentFormProps) {
   const [studentName, setStudentName] = useState("");
   const [rollNumber, setRollNumber] = useState("");
   const [projectName, setProjectName] = useState("");
+  
+  // NAAC states
+  const [programmeName, setProgrammeName] = useState(form.programmeName || "");
+  const [programmeCode, setProgrammeCode] = useState(form.programmeCode || "");
+  const [projectType, setProjectType] = useState(form.projectType || "Project Work");
+  const [courseCode, setCourseCode] = useState(form.courseCode || "");
+  const [yearOfOffering, setYearOfOffering] = useState(form.yearOfOffering || "");
+  const [placeOfProject, setPlaceOfProject] = useState(form.placeOfProject || "");
 
   const [file1, setFile1] = useState<File | null>(null);
   const [file2, setFile2] = useState<File | null>(null);
@@ -156,6 +176,29 @@ export default function StudentForm({ form }: StudentFormProps) {
       setError("Please enter your Roll Number.");
       return;
     }
+    
+    // NAAC client validations
+    if (form.askProgrammeName && !programmeName.trim()) {
+      setError("Please enter the Programme Name.");
+      return;
+    }
+    if (form.askProgrammeCode && !programmeCode.trim()) {
+      setError("Please enter the Programme Code.");
+      return;
+    }
+    if (form.askCourseCode && !courseCode.trim()) {
+      setError("Please enter the Course Code.");
+      return;
+    }
+    if (form.askYearOfOffering && !yearOfOffering.trim()) {
+      setError("Please enter the Year of Offering.");
+      return;
+    }
+    if (form.askPlaceOfProject && !placeOfProject.trim()) {
+      setError("Please enter the Place of Project.");
+      return;
+    }
+
     if (!file1 || !file2) {
       setError("Certificate Page 1 and Certificate Page 2 are required files.");
       return;
@@ -170,6 +213,13 @@ export default function StudentForm({ form }: StudentFormProps) {
     if (projectName.trim()) {
       formData.append("projectName", projectName.trim());
     }
+    if (form.askProgrammeName) formData.append("programmeName", programmeName.trim());
+    if (form.askProgrammeCode) formData.append("programmeCode", programmeCode.trim());
+    if (form.askProjectType) formData.append("projectType", projectType);
+    if (form.askCourseCode) formData.append("courseCode", courseCode.trim());
+    if (form.askYearOfOffering) formData.append("yearOfOffering", yearOfOffering.trim());
+    if (form.askPlaceOfProject) formData.append("placeOfProject", placeOfProject.trim());
+
     formData.append("certificate1", file1);
     formData.append("certificate2", file2);
     if (file3) {
@@ -312,20 +362,116 @@ export default function StudentForm({ form }: StudentFormProps) {
             </div>
           </div>
 
-          {/* Project Name (Optional) */}
+          {/* Title of Project */}
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-zinc-400 flex items-center justify-between">
-              <span>Project Name</span>
-              <span className="text-[10px] text-zinc-500 font-medium">Optional</span>
+              <span>Title of Project *</span>
             </label>
             <input
               type="text"
+              required
               placeholder="e.g. CertSync Certificate Tracking System"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
             />
           </div>
+
+          {/* Conditional NAAC student fields */}
+          {(form.askProgrammeName || form.askProgrammeCode || form.askProjectType || form.askCourseCode || form.askYearOfOffering || form.askPlaceOfProject) && (
+            <div className="p-4 rounded-xl border border-zinc-900 bg-zinc-950/30 space-y-4">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-purple-400/80">
+                Additional Course / Accreditation Details
+              </h3>
+              
+              <div className="grid gap-4 sm:grid-cols-2">
+                {form.askProgrammeName && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-zinc-400">Programme Name *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. BCA"
+                      value={programmeName}
+                      onChange={(e) => setProgrammeName(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                )}
+
+                {form.askProgrammeCode && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-zinc-400">Programme Code *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. 102"
+                      value={programmeCode}
+                      onChange={(e) => setProgrammeCode(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                )}
+
+                {form.askProjectType && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-zinc-400">Project/Field Work/Internship Type *</label>
+                    <select
+                      value={projectType}
+                      onChange={(e) => setProjectType(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 transition cursor-pointer"
+                    >
+                      <option value="Project Work">Project Work</option>
+                      <option value="Internship">Internship</option>
+                      <option value="Field Work">Field Work</option>
+                    </select>
+                  </div>
+                )}
+
+                {form.askCourseCode && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-zinc-400">Course Code *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. BCA601"
+                      value={courseCode}
+                      onChange={(e) => setCourseCode(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                )}
+
+                {form.askYearOfOffering && (
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-zinc-400">Year of Offering *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. 2025-2026"
+                      value={yearOfOffering}
+                      onChange={(e) => setYearOfOffering(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                )}
+
+                {form.askPlaceOfProject && (
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-semibold text-zinc-400">Place of Project *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Kristu Jyoti College"
+                      value={placeOfProject}
+                      onChange={(e) => setPlaceOfProject(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 transition"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* FILE UPLOAD GRID */}
           <div className="space-y-5 pt-3">

@@ -62,6 +62,12 @@ export async function POST(req: Request) {
     const studentName = formData.get("studentName") as string;
     const rollNumber = formData.get("rollNumber") as string;
     const projectName = formData.get("projectName") as string | null;
+    const programmeName = formData.get("programmeName") as string | null;
+    const programmeCode = formData.get("programmeCode") as string | null;
+    const projectType = formData.get("projectType") as string | null;
+    const courseCode = formData.get("courseCode") as string | null;
+    const yearOfOffering = formData.get("yearOfOffering") as string | null;
+    const placeOfProject = formData.get("placeOfProject") as string | null;
 
     if (!formId || !studentName || !rollNumber) {
       return NextResponse.json({ error: "Missing formId, studentName, or rollNumber" }, { status: 400 });
@@ -160,6 +166,12 @@ export async function POST(req: Request) {
       // Update existing submission
       existingSubmission.studentName = studentName;
       existingSubmission.projectName = projectName ? projectName.trim() : undefined;
+      existingSubmission.programmeName = programmeName ? programmeName.trim() : undefined;
+      existingSubmission.programmeCode = programmeCode ? programmeCode.trim() : undefined;
+      existingSubmission.projectType = projectType ? projectType.trim() : undefined;
+      existingSubmission.courseCode = courseCode ? courseCode.trim() : undefined;
+      existingSubmission.yearOfOffering = yearOfOffering ? yearOfOffering.trim() : undefined;
+      existingSubmission.placeOfProject = placeOfProject ? placeOfProject.trim() : undefined;
       existingSubmission.certificate1 = cert1Result;
       existingSubmission.certificate2 = cert2Result;
       existingSubmission.certificate3 = cert3Result;
@@ -178,6 +190,12 @@ export async function POST(req: Request) {
         studentName,
         rollNumber: rollNumber.trim().toUpperCase(),
         projectName: projectName ? projectName.trim() : undefined,
+        programmeName: programmeName ? programmeName.trim() : undefined,
+        programmeCode: programmeCode ? programmeCode.trim() : undefined,
+        projectType: projectType ? projectType.trim() : undefined,
+        courseCode: courseCode ? courseCode.trim() : undefined,
+        yearOfOffering: yearOfOffering ? yearOfOffering.trim() : undefined,
+        placeOfProject: placeOfProject ? placeOfProject.trim() : undefined,
         certificate1: cert1Result,
         certificate2: cert2Result,
         certificate3: cert3Result,

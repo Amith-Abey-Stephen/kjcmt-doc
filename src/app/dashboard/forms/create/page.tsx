@@ -23,6 +23,12 @@ const formSchema = z.object({
   courseCode: z.string().optional(),
   yearOfOffering: z.string().optional(),
   placeOfProject: z.string().optional(),
+  askProgrammeName: z.boolean().optional(),
+  askProgrammeCode: z.boolean().optional(),
+  askProjectType: z.boolean().optional(),
+  askCourseCode: z.boolean().optional(),
+  askYearOfOffering: z.boolean().optional(),
+  askPlaceOfProject: z.boolean().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -52,6 +58,12 @@ export default function CreateFormPage() {
       courseCode: "",
       yearOfOffering: "",
       placeOfProject: "Kristu Jyoti College of Management and Technology",
+      askProgrammeName: false,
+      askProgrammeCode: false,
+      askProjectType: false,
+      askCourseCode: false,
+      askYearOfOffering: false,
+      askPlaceOfProject: false,
     },
   });
 
@@ -257,9 +269,19 @@ export default function CreateFormPage() {
               <div className="p-5 border-t border-zinc-900/60 grid gap-4 sm:grid-cols-2 animate-in">
                 {/* Programme Name */}
                 <div className="space-y-1.5">
-                  <label htmlFor="programmeName" className="text-xs font-semibold text-zinc-400">
-                    Programme Name
-                  </label>
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="programmeName" className="text-xs font-semibold text-zinc-400">
+                      Programme Name
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[10px] text-zinc-500 cursor-pointer hover:text-zinc-300">
+                      <input
+                        type="checkbox"
+                        {...register("askProgrammeName")}
+                        className="rounded border-zinc-800 bg-zinc-950 text-purple-600 focus:ring-purple-500/30 h-3 w-3 cursor-pointer"
+                      />
+                      <span>Ask student to fill</span>
+                    </label>
+                  </div>
                   <input
                     id="programmeName"
                     type="text"
@@ -271,9 +293,19 @@ export default function CreateFormPage() {
 
                 {/* Programme Code */}
                 <div className="space-y-1.5">
-                  <label htmlFor="programmeCode" className="text-xs font-semibold text-zinc-400">
-                    Programme Code
-                  </label>
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="programmeCode" className="text-xs font-semibold text-zinc-400">
+                      Programme Code
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[10px] text-zinc-500 cursor-pointer hover:text-zinc-300">
+                      <input
+                        type="checkbox"
+                        {...register("askProgrammeCode")}
+                        className="rounded border-zinc-800 bg-zinc-950 text-purple-600 focus:ring-purple-500/30 h-3 w-3 cursor-pointer"
+                      />
+                      <span>Ask student to fill</span>
+                    </label>
+                  </div>
                   <input
                     id="programmeCode"
                     type="text"
@@ -285,9 +317,19 @@ export default function CreateFormPage() {
 
                 {/* Project/Field Work/Internship Type */}
                 <div className="space-y-1.5">
-                  <label htmlFor="projectType" className="text-xs font-semibold text-zinc-400">
-                    Project/Field Work/Internship
-                  </label>
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="projectType" className="text-xs font-semibold text-zinc-400">
+                      Project/Field Work/Internship
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[10px] text-zinc-500 cursor-pointer hover:text-zinc-300">
+                      <input
+                        type="checkbox"
+                        {...register("askProjectType")}
+                        className="rounded border-zinc-800 bg-zinc-950 text-purple-600 focus:ring-purple-500/30 h-3 w-3 cursor-pointer"
+                      />
+                      <span>Ask student to fill</span>
+                    </label>
+                  </div>
                   <select
                     id="projectType"
                     {...register("projectType")}
@@ -301,9 +343,19 @@ export default function CreateFormPage() {
 
                 {/* Course Code */}
                 <div className="space-y-1.5">
-                  <label htmlFor="courseCode" className="text-xs font-semibold text-zinc-400">
-                    Course Code
-                  </label>
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="courseCode" className="text-xs font-semibold text-zinc-400">
+                      Course Code
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[10px] text-zinc-500 cursor-pointer hover:text-zinc-300">
+                      <input
+                        type="checkbox"
+                        {...register("askCourseCode")}
+                        className="rounded border-zinc-800 bg-zinc-950 text-purple-600 focus:ring-purple-500/30 h-3 w-3 cursor-pointer"
+                      />
+                      <span>Ask student to fill</span>
+                    </label>
+                  </div>
                   <input
                     id="courseCode"
                     type="text"
@@ -315,9 +367,19 @@ export default function CreateFormPage() {
 
                 {/* Year of Offering */}
                 <div className="space-y-1.5">
-                  <label htmlFor="yearOfOffering" className="text-xs font-semibold text-zinc-400">
-                    Year of Offering
-                  </label>
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="yearOfOffering" className="text-xs font-semibold text-zinc-400">
+                      Year of Offering
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[10px] text-zinc-500 cursor-pointer hover:text-zinc-300">
+                      <input
+                        type="checkbox"
+                        {...register("askYearOfOffering")}
+                        className="rounded border-zinc-800 bg-zinc-950 text-purple-600 focus:ring-purple-500/30 h-3 w-3 cursor-pointer"
+                      />
+                      <span>Ask student to fill</span>
+                    </label>
+                  </div>
                   <input
                     id="yearOfOffering"
                     type="text"
@@ -329,9 +391,19 @@ export default function CreateFormPage() {
 
                 {/* Place of Project */}
                 <div className="space-y-1.5">
-                  <label htmlFor="placeOfProject" className="text-xs font-semibold text-zinc-400">
-                    Place of Project
-                  </label>
+                  <div className="flex justify-between items-center">
+                    <label htmlFor="placeOfProject" className="text-xs font-semibold text-zinc-400">
+                      Place of Project
+                    </label>
+                    <label className="flex items-center gap-1.5 text-[10px] text-zinc-500 cursor-pointer hover:text-zinc-300">
+                      <input
+                        type="checkbox"
+                        {...register("askPlaceOfProject")}
+                        className="rounded border-zinc-800 bg-zinc-950 text-purple-600 focus:ring-purple-500/30 h-3 w-3 cursor-pointer"
+                      />
+                      <span>Ask student to fill</span>
+                    </label>
+                  </div>
                   <input
                     id="placeOfProject"
                     type="text"

@@ -20,6 +20,7 @@ const formSchema = z.object({
   programmeName: z.string().optional(),
   programmeCode: z.string().optional(),
   projectType: z.string().optional(),
+  customProjectType: z.string().optional(),
   courseCode: z.string().optional(),
   yearOfOffering: z.string().optional(),
   placeOfProject: z.string().optional(),
@@ -42,6 +43,7 @@ export default function CreateFormPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -55,6 +57,7 @@ export default function CreateFormPage() {
       programmeName: "",
       programmeCode: "",
       projectType: "Project Work",
+      customProjectType: "",
       courseCode: "",
       yearOfOffering: "",
       placeOfProject: "Kristu Jyoti College of Management and Technology",
@@ -67,9 +70,16 @@ export default function CreateFormPage() {
     },
   });
 
+  const projectTypeValue = watch("projectType");
+
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
     setSubmitError("");
+
+    const submissionData = {
+      ...data,
+      projectType: data.projectType === "Custom" ? data.customProjectType : data.projectType,
+    };
 
     try {
       const res = await fetch("/api/forms", {
@@ -77,7 +87,7 @@ export default function CreateFormPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(submissionData),
       });
 
       const json = await res.json();
@@ -338,7 +348,16 @@ export default function CreateFormPage() {
                     <option value="Project Work">Project Work</option>
                     <option value="Internship">Internship</option>
                     <option value="Field Work">Field Work</option>
+                    <option value="Custom">Other (Specify...)</option>
                   </select>
+                  {projectTypeValue === "Custom" && (
+                    <input
+                      type="text"
+                      placeholder="e.g. Skill Development Project"
+                      {...register("customProjectType")}
+                      className="mt-2 w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-650 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200 animate-in fade-in slide-in-from-top-1"
+                    />
+                  )}
                 </div>
 
                 {/* Course Code */}

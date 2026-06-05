@@ -52,6 +52,7 @@ export default function StudentForm({ form }: StudentFormProps) {
   const [programmeName, setProgrammeName] = useState(form.programmeName || "");
   const [programmeCode, setProgrammeCode] = useState(form.programmeCode || "");
   const [projectType, setProjectType] = useState(form.projectType || "Project Work");
+  const [customProjectType, setCustomProjectType] = useState("");
   const [courseCode, setCourseCode] = useState(form.courseCode || "");
   const [yearOfOffering, setYearOfOffering] = useState(form.yearOfOffering || "");
   const [placeOfProject, setPlaceOfProject] = useState(form.placeOfProject || "");
@@ -186,6 +187,10 @@ export default function StudentForm({ form }: StudentFormProps) {
       setError("Please enter the Programme Code.");
       return;
     }
+    if (form.askProjectType && projectType === "Custom" && !customProjectType.trim()) {
+      setError("Please specify the custom Project/Field Work/Internship type.");
+      return;
+    }
     if (form.askCourseCode && !courseCode.trim()) {
       setError("Please enter the Course Code.");
       return;
@@ -215,7 +220,9 @@ export default function StudentForm({ form }: StudentFormProps) {
     }
     if (form.askProgrammeName) formData.append("programmeName", programmeName.trim());
     if (form.askProgrammeCode) formData.append("programmeCode", programmeCode.trim());
-    if (form.askProjectType) formData.append("projectType", projectType);
+    if (form.askProjectType) {
+      formData.append("projectType", projectType === "Custom" ? customProjectType.trim() : projectType);
+    }
     if (form.askCourseCode) formData.append("courseCode", courseCode.trim());
     if (form.askYearOfOffering) formData.append("yearOfOffering", yearOfOffering.trim());
     if (form.askPlaceOfProject) formData.append("placeOfProject", placeOfProject.trim());
@@ -424,7 +431,18 @@ export default function StudentForm({ form }: StudentFormProps) {
                       <option value="Project Work">Project Work</option>
                       <option value="Internship">Internship</option>
                       <option value="Field Work">Field Work</option>
+                      <option value="Custom">Other (Specify...)</option>
                     </select>
+                    {projectType === "Custom" && (
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Skill Development Project"
+                        value={customProjectType}
+                        onChange={(e) => setCustomProjectType(e.target.value)}
+                        className="mt-2 w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 transition animate-in fade-in slide-in-from-top-1"
+                      />
+                    )}
                   </div>
                 )}
 

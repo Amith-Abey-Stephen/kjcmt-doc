@@ -639,11 +639,39 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-semibold text-zinc-400">Project/Field Work/Internship</label>
-                    <select value={projectType} onChange={(e) => setProjectType(e.target.value)} className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition cursor-pointer">
-                      <option value="Project Work">Project Work</option>
-                      <option value="Internship">Internship</option>
-                      <option value="Field Work">Field Work</option>
-                    </select>
+                    {(() => {
+                      const isCustomProjectType = projectType !== "Project Work" && projectType !== "Internship" && projectType !== "Field Work";
+                      return (
+                        <>
+                          <select
+                            value={isCustomProjectType ? "Custom" : projectType}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (val === "Custom") {
+                                setProjectType("Custom Project");
+                              } else {
+                                setProjectType(val);
+                              }
+                            }}
+                            className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition cursor-pointer"
+                          >
+                            <option value="Project Work">Project Work</option>
+                            <option value="Internship">Internship</option>
+                            <option value="Field Work">Field Work</option>
+                            <option value="Custom">Other (Specify...)</option>
+                          </select>
+                          {isCustomProjectType && (
+                            <input
+                              type="text"
+                              value={projectType}
+                              onChange={(e) => setProjectType(e.target.value)}
+                              className="mt-2 w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition animate-in fade-in slide-in-from-top-1"
+                              placeholder="e.g. Skill Development Project"
+                            />
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-semibold text-zinc-400">Course Code</label>

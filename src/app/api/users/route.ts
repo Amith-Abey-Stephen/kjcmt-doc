@@ -5,6 +5,7 @@ import dbConnect from "@/lib/db";
 import User from "@/lib/models/User";
 import bcrypt from "bcryptjs";
 import { logAction } from "@/lib/audit";
+import { sendDiscordWebhook } from "@/lib/discord-webhook";
 
 export async function GET() {
   try {
@@ -56,6 +57,17 @@ export async function POST(req: Request) {
       `Faculty user "${name}" (${email}) registered with role "${role || "faculty"}" by admin ${session.user.email}`,
       session.user.email || "Admin",
       (session.user as any).id
+    );
+
+    sendDiscordWebhook(
+      "User Created by Admin",
+      [
+        { name: "Name", value: name, inline: true },
+        { name: "Email", value: email, inline: true },
+        { name: "Role", value: role || "faculty", inline: true },
+        { name: "Created By", value: session.user.email || "Admin" },
+      ],
+      0x5865f2
     );
 
     // Return user without password

@@ -3,6 +3,7 @@ import dbConnect from "@/lib/db";
 import User from "@/lib/models/User";
 import bcrypt from "bcryptjs";
 import { logAction } from "@/lib/audit";
+import { sendDiscordWebhook } from "@/lib/discord-webhook";
 
 export async function POST(req: Request) {
   try {
@@ -36,6 +37,16 @@ export async function POST(req: Request) {
       `Teacher "${name}" (${email}) self-registered`,
       email,
       newUser._id.toString()
+    );
+
+    sendDiscordWebhook(
+      "Teacher Self-Registered",
+      [
+        { name: "Name", value: name, inline: true },
+        { name: "Email", value: email, inline: true },
+        { name: "Role", value: "faculty", inline: true },
+      ],
+      0x00ff00
     );
 
     return NextResponse.json({

@@ -17,6 +17,12 @@ const formSchema = z.object({
   deadline: z.string().refine((val) => !isNaN(Date.parse(val)), {
     message: "Must be a valid date and time",
   }),
+  programmeName: z.string().optional(),
+  programmeCode: z.string().optional(),
+  projectType: z.string().optional(),
+  courseCode: z.string().optional(),
+  yearOfOffering: z.string().optional(),
+  placeOfProject: z.string().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -25,6 +31,7 @@ export default function CreateFormPage() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showNaacFields, setShowNaacFields] = useState(false);
 
   const {
     register,
@@ -39,6 +46,12 @@ export default function CreateFormPage() {
       batch: "",
       academicYear: "",
       deadline: "",
+      programmeName: "",
+      programmeCode: "",
+      projectType: "Project Work",
+      courseCode: "",
+      yearOfOffering: "",
+      placeOfProject: "Kristu Jyoti College of Management and Technology",
     },
   });
 
@@ -70,23 +83,44 @@ export default function CreateFormPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 pb-12">
+    <div className="max-w-2xl mx-auto space-y-6 pb-12 animate-in">
       {/* Back CTA */}
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/forms"
-          className="p-1.5 text-zinc-500 hover:text-white rounded-lg hover:bg-zinc-900 border border-zinc-900/60 bg-zinc-950 transition duration-200"
+          className="p-1.5 text-zinc-500 hover:text-white rounded-lg hover:bg-zinc-900 border border-zinc-900/60 bg-zinc-950 transition-all duration-200 hover:border-zinc-700"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Forms Manager</span>
+          <div className="flex items-center gap-2 mb-0.5">
+            <div className="h-4 w-1 bg-purple-500 rounded-full" />
+            <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider">Forms Manager</span>
+          </div>
           <h1 className="text-xl font-bold tracking-tight text-white">Create Collection Campaign</h1>
         </div>
       </div>
 
+      {/* Step indicator */}
+      <div className="flex items-center gap-2 px-1">
+        <div className="flex items-center gap-2">
+          <div className="h-6 w-6 rounded-full bg-purple-600 flex items-center justify-center text-[10px] font-bold text-white">1</div>
+          <span className="text-[10px] font-semibold text-purple-400">Campaign Details</span>
+        </div>
+        <div className="h-px flex-1 bg-zinc-800 mx-2" />
+        <div className="flex items-center gap-2 opacity-40">
+          <div className="h-6 w-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-500">2</div>
+          <span className="text-[10px] font-semibold text-zinc-500">Upload Student List</span>
+        </div>
+        <div className="h-px flex-1 bg-zinc-800 mx-2" />
+        <div className="flex items-center gap-2 opacity-40">
+          <div className="h-6 w-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-500">3</div>
+          <span className="text-[10px] font-semibold text-zinc-500">Collect Certificates</span>
+        </div>
+      </div>
+
       {/* Main card form */}
-      <div className="glass-card p-8 rounded-2xl bg-zinc-900/40 border border-zinc-900 shadow-2xl backdrop-blur-xl">
+      <div className="glass-card p-8 rounded-2xl bg-zinc-900/40 border border-zinc-900 shadow-2xl backdrop-blur-xl animate-in animate-in-delay-1">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {submitError && (
             <div className="p-3 rounded-lg bg-red-950/40 border border-red-500/20 text-red-200 text-xs text-center">
@@ -201,6 +235,113 @@ export default function CreateFormPage() {
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.deadline.message}</p>
               )}
             </div>
+          </div>
+
+          {/* Accordion for NAAC settings */}
+          <div className="border border-zinc-900 rounded-xl overflow-hidden bg-zinc-950/20">
+            <button
+              type="button"
+              onClick={() => setShowNaacFields(!showNaacFields)}
+              className="w-full flex items-center justify-between px-5 py-3.5 text-left text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-900/30 hover:bg-zinc-900/50 transition duration-200"
+            >
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-purple-500" />
+                <span>NAAC / Curriculum Project Details (Optional)</span>
+              </div>
+              <span className="text-zinc-500 font-mono text-[10px]">
+                {showNaacFields ? "Hide [−]" : "Configure Program Defaults [+]"}
+              </span>
+            </button>
+
+            {showNaacFields && (
+              <div className="p-5 border-t border-zinc-900/60 grid gap-4 sm:grid-cols-2 animate-in">
+                {/* Programme Name */}
+                <div className="space-y-1.5">
+                  <label htmlFor="programmeName" className="text-xs font-semibold text-zinc-400">
+                    Programme Name
+                  </label>
+                  <input
+                    id="programmeName"
+                    type="text"
+                    placeholder="e.g. Bachelor of Computer Applications"
+                    {...register("programmeName")}
+                    className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                  />
+                </div>
+
+                {/* Programme Code */}
+                <div className="space-y-1.5">
+                  <label htmlFor="programmeCode" className="text-xs font-semibold text-zinc-400">
+                    Programme Code
+                  </label>
+                  <input
+                    id="programmeCode"
+                    type="text"
+                    placeholder="e.g. BCA"
+                    {...register("programmeCode")}
+                    className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                  />
+                </div>
+
+                {/* Project/Field Work/Internship Type */}
+                <div className="space-y-1.5">
+                  <label htmlFor="projectType" className="text-xs font-semibold text-zinc-400">
+                    Project/Field Work/Internship
+                  </label>
+                  <select
+                    id="projectType"
+                    {...register("projectType")}
+                    className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200 cursor-pointer"
+                  >
+                    <option value="Project Work">Project Work</option>
+                    <option value="Internship">Internship</option>
+                    <option value="Field Work">Field Work</option>
+                  </select>
+                </div>
+
+                {/* Course Code */}
+                <div className="space-y-1.5">
+                  <label htmlFor="courseCode" className="text-xs font-semibold text-zinc-400">
+                    Course Code
+                  </label>
+                  <input
+                    id="courseCode"
+                    type="text"
+                    placeholder="e.g. BCA601"
+                    {...register("courseCode")}
+                    className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                  />
+                </div>
+
+                {/* Year of Offering */}
+                <div className="space-y-1.5">
+                  <label htmlFor="yearOfOffering" className="text-xs font-semibold text-zinc-400">
+                    Year of Offering
+                  </label>
+                  <input
+                    id="yearOfOffering"
+                    type="text"
+                    placeholder="e.g. 2025-2026"
+                    {...register("yearOfOffering")}
+                    className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                  />
+                </div>
+
+                {/* Place of Project */}
+                <div className="space-y-1.5">
+                  <label htmlFor="placeOfProject" className="text-xs font-semibold text-zinc-400">
+                    Place of Project
+                  </label>
+                  <input
+                    id="placeOfProject"
+                    type="text"
+                    placeholder="e.g. Kristu Jyoti College"
+                    {...register("placeOfProject")}
+                    className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-zinc-900/60">

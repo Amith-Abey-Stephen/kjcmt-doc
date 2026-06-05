@@ -16,6 +16,7 @@ export async function GET(req: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
+    const user = session.user as any;
     const { searchParams } = new URL(req.url);
     const formId = searchParams.get("formId");
     const sortMode = searchParams.get("sort") || "roll-asc"; // excel | roll-asc | roll-desc | name-asc
@@ -28,6 +29,9 @@ export async function GET(req: Request) {
     const form = await Form.findById(formId);
     if (!form) {
       return new Response("Form not found", { status: 404 });
+    }
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return new Response("Unauthorized. You do not own this form.", { status: 403 });
     }
 
     const submissions = await Submission.find({ formId });
@@ -77,7 +81,8 @@ export async function GET(req: Request) {
     await logAction(
       "PDF Export Generated",
       `Merged PDF bundle generated for form "${form.title}" (${submissions.length} students, sorted by: ${sortMode}, compression: ${compression})`,
-      session.user.email || "Faculty"
+      session.user.email || "Faculty",
+      user.id
     );
 
     // Return the response as a downloadable PDF stream

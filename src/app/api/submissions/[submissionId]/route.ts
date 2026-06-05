@@ -23,6 +23,11 @@ export async function DELETE(req: Request, props: { params: Promise<{ submission
 
     const form = await Form.findById(submission.formId);
 
+    const user = session.user as any;
+    if (user.role !== "admin" && form?.createdBy?.toString() !== user.id) {
+      return NextResponse.json({ error: "Unauthorized. You do not own this form." }, { status: 403 });
+    }
+
     // Delete files in Cloudinary or local storage
     if (submission.certificate1?.publicId) {
       await deleteCertificate(submission.certificate1.publicId, submission.certificate1.url);
@@ -40,7 +45,8 @@ export async function DELETE(req: Request, props: { params: Promise<{ submission
     await logAction(
       "Submission Deleted",
       `Submission from student "${submission.studentName}" (${submission.rollNumber}) deleted by ${session.user.email}`,
-      session.user.email || "Faculty"
+      session.user.email || "Faculty",
+      (session.user as any).id
     );
 
     return NextResponse.json({ message: "Submission deleted successfully" });

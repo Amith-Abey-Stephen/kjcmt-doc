@@ -18,6 +18,7 @@ import {
   Loader2,
   ExternalLink,
   ChevronRight,
+  AlertTriangle,
 } from "lucide-react";
 
 interface FormItem {
@@ -145,22 +146,28 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
     <div className="space-y-6">
       {/* Header and Search Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-          <input
-            type="text"
-            placeholder="Filter forms by course, title, or batch..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/40 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/35 transition"
-          />
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="h-5 w-1 bg-purple-500 rounded-full" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">Form Campaigns</span>
+          </div>
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+            <input
+              type="text"
+              placeholder="Filter forms by course, title, or batch..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/40 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/35 transition"
+            />
+          </div>
         </div>
 
         <Link
           href="/dashboard/forms/create"
-          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-700 rounded-xl transition shadow-md shadow-purple-600/10 active:scale-95 whitespace-nowrap"
+          className="group inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl transition-all duration-200 shadow-lg shadow-purple-600/20 active:scale-95 whitespace-nowrap"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
           <span>Create Form</span>
         </Link>
       </div>
@@ -168,7 +175,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
       {/* Forms Listing Grid */}
       {filteredForms.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredForms.map((form) => {
+          {filteredForms.map((form, idx) => {
             const isExpired = new Date(form.deadline) < new Date();
             const expected = form.studentListCount;
             const progress = expected > 0 ? Math.round((form.submissionCount / expected) * 100) : 0;
@@ -176,13 +183,14 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
             return (
               <div
                 key={form.id}
-                className="glass-card flex flex-col justify-between p-6 rounded-2xl bg-zinc-900/40 border border-zinc-900 hover:shadow-xl hover:shadow-purple-500/[0.02]"
+                className="glass-card flex flex-col justify-between p-6 rounded-2xl bg-zinc-900/40 border border-zinc-900 hover:shadow-xl hover:shadow-purple-500/[0.03] transition-all duration-300 group animate-in"
+                style={{ animationDelay: `${idx * 0.05}s` }}
               >
                 {/* Meta Head */}
                 <div className="space-y-1">
                   <div className="flex items-start justify-between">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider ${
                         isExpired
                           ? "bg-red-500/10 text-red-400 border border-red-500/20"
                           : "bg-green-500/10 text-green-400 border border-green-500/20"
@@ -192,7 +200,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
                     </span>
                     <span className="text-[10px] text-zinc-500 font-semibold">{form.academicYear}</span>
                   </div>
-                  <h3 className="text-sm font-semibold text-white pt-1 line-clamp-1">{form.title}</h3>
+                  <h3 className="text-sm font-semibold text-white pt-1 line-clamp-2 group-hover:text-purple-400 transition-colors">{form.title}</h3>
                   <div className="flex items-center gap-1 text-[10px] text-zinc-400">
                     <Layers className="h-3 w-3 text-purple-400" />
                     <span>
@@ -210,9 +218,9 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
                     </span>
                   </div>
 
-                  <div className="h-1.5 w-full bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                  <div className="h-2 w-full bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${
+                      className={`h-full rounded-full transition-all duration-700 ease-out ${
                         progress >= 100
                           ? "bg-green-500"
                           : "bg-gradient-to-r from-purple-500 to-indigo-500"
@@ -221,8 +229,9 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
                     />
                   </div>
                   {expected === 0 && (
-                    <p className="text-[9px] text-yellow-500/80 font-medium">
-                      ⚠️ No master student list uploaded.
+                    <p className="text-[9px] text-yellow-500/80 font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" />
+                      No master student list uploaded
                     </p>
                   )}
                 </div>
@@ -237,7 +246,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => handleCopyLink(form.id)}
-                    className="inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-zinc-950 text-[10px] font-semibold text-zinc-400 hover:text-white rounded-lg border border-zinc-900 transition hover:bg-zinc-900"
+                    className="group/btn inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-zinc-950 text-[10px] font-semibold text-zinc-400 hover:text-white rounded-lg border border-zinc-900 transition-all hover:bg-zinc-900 hover:border-zinc-700"
                   >
                     {copiedId === form.id ? (
                       <>
@@ -254,7 +263,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
 
                   <button
                     onClick={() => setActiveUploadFormId(form.id)}
-                    className="inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-zinc-950 text-[10px] font-semibold text-zinc-400 hover:text-white rounded-lg border border-zinc-900 transition hover:bg-zinc-900"
+                    className="group/btn inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-zinc-950 text-[10px] font-semibold text-zinc-400 hover:text-white rounded-lg border border-zinc-900 transition-all hover:bg-zinc-900 hover:border-zinc-700"
                   >
                     <FileSpreadsheet className="h-3.5 w-3.5 text-green-500/80" />
                     <span>Upload Excel</span>
@@ -262,16 +271,16 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
 
                   <Link
                     href={`/dashboard/submissions?formId=${form.id}`}
-                    className="col-span-2 inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-purple-600 hover:bg-purple-700 text-[10px] font-semibold text-white rounded-lg transition active:scale-98 shadow shadow-purple-600/10"
+                    className="col-span-2 group/btn inline-flex items-center justify-center gap-1.5 py-2 px-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-[10px] font-semibold text-white rounded-lg transition-all duration-200 active:scale-[0.98] shadow-md shadow-purple-600/15"
                   >
                     <FileText className="h-3.5 w-3.5" />
                     <span>View Submissions</span>
-                    <ChevronRight className="h-3 w-3" />
+                    <ChevronRight className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5" />
                   </Link>
 
                   <button
                     onClick={() => setActiveDeleteFormId(form.id)}
-                    className="col-span-2 inline-flex items-center justify-center gap-1 py-1.5 text-[9px] text-zinc-600 hover:text-red-400 transition"
+                    className="col-span-2 inline-flex items-center justify-center gap-1 py-1.5 text-[9px] text-zinc-600 hover:text-red-400 transition-colors hover:bg-red-500/5 rounded-lg"
                   >
                     <Trash2 className="h-3 w-3 mr-0.5" />
                     <span>Delete Collection Form</span>
@@ -282,10 +291,12 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
           })}
         </div>
       ) : (
-        <div className="glass-card text-center p-12 rounded-2xl bg-zinc-900/10 border border-dashed border-zinc-800">
-          <FileText className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
+        <div className="glass-card text-center p-12 rounded-2xl bg-zinc-900/10 border border-dashed border-zinc-800 group hover:border-purple-500/20 transition-all duration-300">
+          <div className="h-14 w-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto mb-4 group-hover:border-purple-500/30 group-hover:bg-purple-500/5 transition-all duration-300">
+            <FileText className="h-6 w-6 text-zinc-600 group-hover:text-purple-400 transition-colors" />
+          </div>
           <h3 className="text-sm font-semibold text-zinc-300">No collection forms found</h3>
-          <p className="text-xs text-zinc-500 max-w-xs mx-auto mt-1.5">
+          <p className="text-xs text-zinc-500 max-w-md mx-auto mt-1.5">
             Create a new form campaign or adjust your search filter to find existing collections.
           </p>
         </div>
@@ -293,8 +304,8 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
 
       {/* EXCEL UPLOAD DIALOG SHEET */}
       {activeUploadFormId && (
-        <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-md glass-card rounded-2xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in">
+          <div className="w-full max-w-md glass-card rounded-2xl bg-zinc-900 border border-zinc-800 p-6 shadow-2xl relative animate-scale-in">
             <button
               onClick={() => {
                 setActiveUploadFormId(null);

@@ -5,7 +5,6 @@ import {
   FileSpreadsheet,
   Download,
   AlertTriangle,
-  Loader2,
   CheckCircle,
   XCircle,
   FileText,
@@ -13,18 +12,27 @@ import {
   BarChart,
   PieChart,
 } from "lucide-react";
+import { StatsCardSkeleton, TableSkeleton } from "@/components/Skeleton";
 
 interface FormOption {
   id: string;
   title: string;
   department: string;
   batch: string;
+  academicYear?: string;
+  programmeName?: string;
+  programmeCode?: string;
+  projectType?: string;
+  courseCode?: string;
+  yearOfOffering?: string;
+  placeOfProject?: string;
 }
 
 interface SubmissionItem {
   _id: string;
   studentName: string;
   rollNumber: string;
+  projectName?: string;
   certificate1: { url: string };
   certificate2: { url: string };
   certificate3?: { url: string };
@@ -46,7 +54,28 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
   const [submissions, setSubmissions] = useState<SubmissionItem[]>([]);
   const [studentList, setStudentList] = useState<StudentListItem[]>([]);
   const [loading, setLoading] = useState(false);
-  const [reportType, setReportType] = useState<"submission" | "missing">("submission");
+  const [reportType, setReportType] = useState<"submission" | "missing" | "naac" | "pending">("submission");
+
+  // NAAC Form Fields
+  const [programmeName, setProgrammeName] = useState("");
+  const [programmeCode, setProgrammeCode] = useState("");
+  const [projectType, setProjectType] = useState("Project Work");
+  const [courseCode, setCourseCode] = useState("");
+  const [yearOfOffering, setYearOfOffering] = useState("");
+  const [placeOfProject, setPlaceOfProject] = useState("Kristu Jyoti College of Management and Technology");
+
+  const selectedForm = forms.find((f) => f.id === selectedFormId);
+
+  useEffect(() => {
+    if (selectedForm) {
+      setProgrammeName(selectedForm.programmeName || selectedForm.department || "");
+      setProgrammeCode(selectedForm.programmeCode || selectedForm.department || "");
+      setProjectType(selectedForm.projectType || "Project Work");
+      setCourseCode(selectedForm.courseCode || "");
+      setYearOfOffering(selectedForm.yearOfOffering || selectedForm.academicYear || "");
+      setPlaceOfProject(selectedForm.placeOfProject || "Kristu Jyoti College of Management and Technology");
+    }
+  }, [selectedFormId, selectedForm]);
 
   const fetchData = useCallback(async (formId: string) => {
     if (!formId) return;
@@ -99,6 +128,15 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
     }
   });
 
+  // 1b. Pending list preview rows (only students who haven't submitted)
+  const pendingPreviewRows = studentList
+    .filter((student) => !submissionMap.has(student.rollNumber.toUpperCase()))
+    .map((student) => ({
+      rollNumber: student.rollNumber,
+      studentName: student.studentName,
+      status: "Pending" as const,
+    }));
+
   // 2. Missing files preview records
   const missingFilesRows = studentList.map((student) => {
     const sub = submissionMap.get(student.rollNumber.toUpperCase());
@@ -120,6 +158,37 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
         cert1: "Uploaded",
         cert2: "Uploaded",
         cert3: sub.certificate3?.url ? "Uploaded" : "Not Provided",
+      });
+    }
+  });
+
+  // 3. NAAC specific preview records
+  const naacPreviewRows = studentList.map((student) => {
+    const sub = submissionMap.get(student.rollNumber.toUpperCase());
+    return {
+      programmeName: programmeName || "—",
+      programmeCode: programmeCode || "—",
+      projectType: projectType || "—",
+      courseCode: courseCode || "—",
+      yearOfOffering: yearOfOffering || "—",
+      studentName: student.studentName,
+      projectName: sub ? (sub.projectName || "—") : "—",
+      placeOfProject: placeOfProject || "—",
+    };
+  });
+
+  submissions.forEach((sub) => {
+    const roll = sub.rollNumber.toUpperCase();
+    if (!masterRolls.has(roll)) {
+      naacPreviewRows.push({
+        programmeName: programmeName || "—",
+        programmeCode: programmeCode || "—",
+        projectType: projectType || "—",
+        courseCode: courseCode || "—",
+        yearOfOffering: yearOfOffering || "—",
+        studentName: `${sub.studentName} (Unregistered)`,
+        projectName: sub.projectName || "—",
+        placeOfProject: placeOfProject || "—",
       });
     }
   });
@@ -150,7 +219,21 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
 
   const handleExportExcel = () => {
     if (!selectedFormId) return;
-    window.open(`/api/export/excel?formId=${selectedFormId}&reportType=${reportType}`, "_blank");
+    if (reportType === "naac") {
+      const queryParams = new URLSearchParams({
+        formId: selectedFormId,
+        reportType: "naac",
+        programmeName,
+        programmeCode,
+        projectType,
+        courseCode,
+        yearOfOffering,
+        placeOfProject,
+      });
+      window.open(`/api/export/excel?${queryParams.toString()}`, "_blank");
+    } else {
+      window.open(`/api/export/excel?formId=${selectedFormId}&reportType=${reportType}`, "_blank");
+    }
   };
 
   return (
@@ -209,10 +292,10 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
       {selectedFormId && !loading && (
         <div className="grid gap-6 md:grid-cols-3">
           {/* Submission Rate Chart Card */}
-          <div className="glass-card p-6 rounded-2xl bg-zinc-900/40 border border-zinc-900 space-y-4">
+          <div className="glass-card p-6 rounded-2xl bg-zinc-900/40 border border-zinc-900 space-y-4 animate-in group">
             <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
               <span className="text-xs font-semibold text-zinc-300">Campaign Overview</span>
-              <PieChart className="h-4 w-4 text-purple-400" />
+              <PieChart className="h-4 w-4 text-purple-400 group-hover:scale-110 transition-transform" />
             </div>
             <div className="flex items-center justify-between text-xs">
               <span className="text-zinc-500">Total Registered Class:</span>
@@ -226,29 +309,40 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
               <span className="text-zinc-500">Pending Submissions:</span>
               <span className="font-bold text-yellow-500">{pendingCount} remaining</span>
             </div>
-            <div className="pt-2 border-t border-zinc-900/60 flex items-center justify-between text-xs font-semibold">
-              <span className="text-zinc-400">Total Completion Rate:</span>
-              <span className="text-purple-400">{completionRate}%</span>
+            <div className="pt-3 border-t border-zinc-900/60">
+              <div className="flex items-center justify-between text-xs font-semibold mb-2">
+                <span className="text-zinc-400">Total Completion Rate:</span>
+                <span className="text-purple-400">{completionRate}%</span>
+              </div>
+              <div className="h-2 w-full bg-zinc-950 rounded-full overflow-hidden border border-zinc-900">
+                <div
+                  className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-700"
+                  style={{ width: `${completionRate}%` }}
+                />
+              </div>
             </div>
           </div>
 
           {/* Missing Files Stats Card */}
-          <div className="glass-card p-6 rounded-2xl bg-zinc-900/40 border border-zinc-900 space-y-4 md:col-span-2">
+          <div className="glass-card p-6 rounded-2xl bg-zinc-900/40 border border-zinc-900 space-y-4 md:col-span-2 animate-in animate-in-delay-1">
             <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
               <span className="text-xs font-semibold text-zinc-300">Missing Certificate Analysis</span>
               <BarChart className="h-4 w-4 text-purple-400" />
             </div>
 
-            <div className="space-y-3.5 pt-1">
+            <div className="space-y-4 pt-1">
               {/* Progress 1 */}
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-400">Missing Certificate Page 1</span>
+                  <span className="text-zinc-400 flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-sm bg-red-500 inline-block" />
+                    Missing Certificate Page 1
+                  </span>
                   <span className="font-bold text-red-400">{missingCert1Count} students</span>
                 </div>
-                <div className="h-2 w-full bg-zinc-950 rounded-full border border-zinc-900 overflow-hidden">
+                <div className="h-2.5 w-full bg-zinc-950 rounded-full border border-zinc-900 overflow-hidden">
                   <div
-                    className="h-full bg-red-500/80 rounded-full"
+                    className="h-full bg-gradient-to-r from-red-500/80 to-red-400 rounded-full transition-all duration-700"
                     style={{ width: `${totalExpected > 0 ? (missingCert1Count / totalExpected) * 100 : 0}%` }}
                   />
                 </div>
@@ -257,12 +351,15 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
               {/* Progress 2 */}
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-400">Missing Certificate Page 2</span>
+                  <span className="text-zinc-400 flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-sm bg-red-500 inline-block" />
+                    Missing Certificate Page 2
+                  </span>
                   <span className="font-bold text-red-400">{missingCert2Count} students</span>
                 </div>
-                <div className="h-2 w-full bg-zinc-950 rounded-full border border-zinc-900 overflow-hidden">
+                <div className="h-2.5 w-full bg-zinc-950 rounded-full border border-zinc-900 overflow-hidden">
                   <div
-                    className="h-full bg-red-500/80 rounded-full"
+                    className="h-full bg-gradient-to-r from-red-500/80 to-red-400 rounded-full transition-all duration-700"
                     style={{ width: `${totalExpected > 0 ? (missingCert2Count / totalExpected) * 100 : 0}%` }}
                   />
                 </div>
@@ -271,12 +368,15 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
               {/* Progress 3 */}
               <div className="space-y-1">
                 <div className="flex justify-between text-xs">
-                  <span className="text-zinc-400">Missing Company Certificate (Optional)</span>
+                  <span className="text-zinc-400 flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-sm bg-zinc-600 inline-block" />
+                    Missing Company Certificate (Optional)
+                  </span>
                   <span className="font-bold text-zinc-500">{missingCert3Count} students</span>
                 </div>
-                <div className="h-2 w-full bg-zinc-950 rounded-full border border-zinc-900 overflow-hidden">
+                <div className="h-2.5 w-full bg-zinc-950 rounded-full border border-zinc-900 overflow-hidden">
                   <div
-                    className="h-full bg-zinc-700 rounded-full"
+                    className="h-full bg-gradient-to-r from-zinc-600 to-zinc-500 rounded-full transition-all duration-700"
                     style={{ width: `${totalExpected > 0 ? (missingCert3Count / totalExpected) * 100 : 0}%` }}
                   />
                 </div>
@@ -308,13 +408,109 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
         >
           Missing Files Audit Preview
         </button>
+        <button
+          onClick={() => setReportType("naac")}
+          className={`px-5 py-3 text-xs font-semibold border-b-2 transition ${
+            reportType === "naac"
+              ? "border-purple-500 text-white bg-purple-500/[0.02]"
+              : "border-transparent text-zinc-500 hover:text-zinc-300"
+          }`}
+        >
+          Curriculum Project / NAAC Preview
+        </button>
+        <button
+          onClick={() => setReportType("pending")}
+          className={`px-5 py-3 text-xs font-semibold border-b-2 transition ${
+            reportType === "pending"
+              ? "border-purple-500 text-white bg-purple-500/[0.02]"
+              : "border-transparent text-zinc-500 hover:text-zinc-300"
+          }`}
+        >
+          Pending List Preview
+        </button>
       </div>
+
+      {/* NAAC CONFIGURATION PARAMETERS */}
+      {reportType === "naac" && (
+        <div className="glass-card p-6 rounded-2xl bg-zinc-900/40 border border-zinc-900 grid gap-4 sm:grid-cols-2 md:grid-cols-3 animate-in">
+          <div className="col-span-full">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-purple-400 mb-1">NAAC / Department Template Configuration</h3>
+            <p className="text-[10px] text-zinc-500">Configure program-wide static parameters. Student name and project title will dynamically map from individual submissions.</p>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold text-zinc-400">Programme Name</label>
+            <input
+              type="text"
+              value={programmeName}
+              onChange={(e) => setProgrammeName(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition"
+              placeholder="e.g. Bachelor of Computer Applications"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold text-zinc-400">Programme Code</label>
+            <input
+              type="text"
+              value={programmeCode}
+              onChange={(e) => setProgrammeCode(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition"
+              placeholder="e.g. BCA"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold text-zinc-400">Project/Field Work/Internship</label>
+            <select
+              value={projectType}
+              onChange={(e) => setProjectType(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition cursor-pointer"
+            >
+              <option value="Project Work">Project Work</option>
+              <option value="Internship">Internship</option>
+              <option value="Field Work">Field Work</option>
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold text-zinc-400">Course Code</label>
+            <input
+              type="text"
+              value={courseCode}
+              onChange={(e) => setCourseCode(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition"
+              placeholder="e.g. BCA601"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold text-zinc-400">Year of Offering</label>
+            <input
+              type="text"
+              value={yearOfOffering}
+              onChange={(e) => setYearOfOffering(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition"
+              placeholder="e.g. 2025-2026"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold text-zinc-400">Place of Project</label>
+            <input
+              type="text"
+              value={placeOfProject}
+              onChange={(e) => setPlaceOfProject(e.target.value)}
+              className="w-full px-3 py-2 bg-zinc-950/60 border border-zinc-900 rounded-lg text-xs text-white focus:outline-none focus:border-purple-500 transition"
+              placeholder="e.g. Kristu Jyoti College"
+            />
+          </div>
+        </div>
+      )}
 
       {/* PREVIEW CONTAINER */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <Loader2 className="h-7 w-7 animate-spin text-purple-500" />
-          <span className="text-xs text-zinc-500">Compiling report preview...</span>
+        <div className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <StatsCardSkeleton key={i} />
+            ))}
+          </div>
+          <TableSkeleton rows={5} />
         </div>
       ) : (
         <div className="glass-card rounded-2xl bg-zinc-900/20 border border-zinc-900 overflow-hidden">
@@ -364,6 +560,78 @@ export default function ReportsClient({ forms }: ReportsClientProps) {
                     <tr>
                       <td colSpan={4} className="text-center py-12 text-zinc-500 font-medium bg-zinc-900/10">
                         No students registry found to compile.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            ) : reportType === "pending" ? (
+              /* PENDING LIST PREVIEW TABLE */
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-zinc-900 bg-zinc-950/40 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                    <th className="py-4 px-6">Roll Number</th>
+                    <th className="py-4 px-6">Student Name</th>
+                    <th className="py-4 px-6">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-900/60 text-xs text-zinc-300">
+                  {pendingPreviewRows.length > 0 ? (
+                    pendingPreviewRows.map((row, idx) => (
+                      <tr key={`${row.rollNumber}-${idx}`} className="hover:bg-zinc-900/20 transition">
+                        <td className="py-4 px-6 font-mono font-bold text-purple-400">{row.rollNumber}</td>
+                        <td className="py-4 px-6 font-medium text-white">{row.studentName}</td>
+                        <td className="py-4 px-6">
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                            <XCircle className="h-3 w-3" />
+                            <span>Pending</span>
+                          </span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={3} className="text-center py-12 text-green-400 font-medium bg-zinc-900/10">
+                        <CheckCircle className="h-5 w-5 inline-block mr-2" />
+                        All students have submitted!
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            ) : reportType === "naac" ? (
+              /* NAAC PREVIEW TABLE */
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-zinc-900 bg-zinc-950/40 text-[10px] font-bold uppercase tracking-wider text-zinc-500">
+                    <th className="py-4 px-4">Programme Name</th>
+                    <th className="py-4 px-4">Programme Code</th>
+                    <th className="py-4 px-4">Project/Field Work/Internship</th>
+                    <th className="py-4 px-4">Course Code</th>
+                    <th className="py-4 px-4">Year of Offering</th>
+                    <th className="py-4 px-4">Name of Student</th>
+                    <th className="py-4 px-4">Title of Project</th>
+                    <th className="py-4 px-4">Place of Project</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-900/60 text-xs text-zinc-300">
+                  {naacPreviewRows.length > 0 ? (
+                    naacPreviewRows.map((row, idx) => (
+                      <tr key={`naac-${idx}`} className="hover:bg-zinc-900/20 transition">
+                        <td className="py-4 px-4 font-medium text-white max-w-[150px] truncate" title={row.programmeName}>{row.programmeName}</td>
+                        <td className="py-4 px-4 text-purple-400 font-bold">{row.programmeCode}</td>
+                        <td className="py-4 px-4 text-zinc-400">{row.projectType}</td>
+                        <td className="py-4 px-4 text-zinc-400 font-mono">{row.courseCode}</td>
+                        <td className="py-4 px-4 text-zinc-500">{row.yearOfOffering}</td>
+                        <td className="py-4 px-4 font-semibold text-white">{row.studentName}</td>
+                        <td className="py-4 px-4 text-purple-300 font-medium max-w-[200px] truncate" title={row.projectName}>{row.projectName}</td>
+                        <td className="py-4 px-4 text-zinc-400 max-w-[150px] truncate" title={row.placeOfProject}>{row.placeOfProject}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="text-center py-12 text-zinc-500 font-medium bg-zinc-900/10">
+                        No student submissions found to compile.
                       </td>
                     </tr>
                   )}

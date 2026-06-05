@@ -12,7 +12,9 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const logs = await AuditLog.find({}).sort({ timestamp: -1 }).limit(100);
+    const user = session.user as any;
+    const filter = user.role === "admin" ? {} : { userId: user.id };
+    const logs = await AuditLog.find(filter).sort({ timestamp: -1 }).limit(100);
     return NextResponse.json(logs);
   } catch (error: any) {
     console.error("GET Audit Logs error:", error);

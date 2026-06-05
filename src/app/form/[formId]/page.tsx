@@ -37,9 +37,14 @@ export default async function StudentFormPage(props: StudentFormPageProps) {
   if (!form) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
-        <div className="w-full max-w-md glass-card p-8 rounded-2xl border border-zinc-900 text-center space-y-4">
-          <AlertTriangle className="h-10 w-10 text-red-500 mx-auto animate-pulse" />
-          <h2 className="text-lg font-bold text-white">Invalid Form Link</h2>
+        <div className="w-full max-w-md glass-card p-8 rounded-2xl border border-zinc-900 text-center space-y-5 animate-in">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 mx-auto">
+            <AlertTriangle className="h-8 w-8 animate-float" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white">Invalid Form Link</h2>
+            <p className="text-xs text-zinc-400 mt-2">This link could not be verified</p>
+          </div>
           <p className="text-xs text-zinc-500 leading-relaxed">
             The collection form link you are trying to access is invalid, broken, or has been removed by the faculty. Please check with your class tutor.
           </p>
@@ -53,24 +58,27 @@ export default async function StudentFormPage(props: StudentFormPageProps) {
   if (isExpired || form.status === "expired") {
     return (
       <div className="flex min-h-screen items-center justify-center bg-zinc-950 px-4">
-        <div className="w-full max-w-md glass-card p-8 rounded-2xl border border-zinc-900 text-center space-y-5">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 mx-auto">
-            <Calendar className="h-6 w-6" />
+        <div className="w-full max-w-md glass-card p-8 rounded-2xl border border-zinc-900 text-center space-y-5 animate-in">
+          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 mx-auto">
+            <Calendar className="h-7 w-7 animate-float" />
           </div>
           <div>
             <h2 className="text-lg font-bold text-white">Campaign Closed</h2>
             <p className="text-xs text-zinc-400 mt-1.5">{form.title}</p>
           </div>
-          <p className="text-xs text-zinc-500 leading-relaxed">
-            The submission window closed on <strong className="text-zinc-300">{new Date(form.deadline).toLocaleString()}</strong>. Late uploads are locked. Please contact your administrator.
-          </p>
+          <div className="p-3 rounded-xl bg-zinc-950/40 border border-zinc-900">
+            <p className="text-xs text-zinc-500 leading-relaxed">
+              The submission window closed on <strong className="text-zinc-300">{new Date(form.deadline).toLocaleString()}</strong>. Late uploads are locked.
+            </p>
+          </div>
+          <p className="text-xs text-zinc-500">Please contact your administrator.</p>
           <div className="pt-2">
             <Link
               href="/login"
-              className="inline-flex items-center gap-1 text-xs text-purple-400 hover:text-purple-300 font-semibold"
+              className="group inline-flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 font-semibold transition-colors"
             >
               <span>Faculty login portal</span>
-              <ArrowRight className="h-3 w-3" />
+              <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </div>
         </div>

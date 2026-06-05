@@ -25,6 +25,16 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "formId is required" }, { status: 400 });
     }
 
+    // Verify form ownership
+    const form = await Form.findById(formId);
+    if (!form) {
+      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+    }
+    const user = session.user as any;
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return NextResponse.json({ error: "Unauthorized. You do not own this form." }, { status: 403 });
+    }
+
     // Build filter query
     const query: any = { formId };
     if (search) {
@@ -51,6 +61,7 @@ export async function POST(req: Request) {
     const formId = formData.get("formId") as string;
     const studentName = formData.get("studentName") as string;
     const rollNumber = formData.get("rollNumber") as string;
+    const projectName = formData.get("projectName") as string | null;
 
     if (!formId || !studentName || !rollNumber) {
       return NextResponse.json({ error: "Missing formId, studentName, or rollNumber" }, { status: 400 });
@@ -120,34 +131,35 @@ export async function POST(req: Request) {
     let cert2Result = existingSubmission?.certificate2;
     let cert3Result = existingSubmission?.certificate3;
 
-    // Handle Certificate 1
-    if (file1) {
-      if (existingSubmission?.certificate1?.publicId) {
-        await deleteCertificate(existingSubmission.certificate1.publicId, existingSubmission.certificate1.url);
-      }
-      cert1Result = await uploadFile(file1, 1);
-    }
+    // Delete old certificates in parallel
+    await Promise.all([
+      file1 && existingSubmission?.certificate1?.publicId
+        ? deleteCertificate(existingSubmission.certificate1.publicId, existingSubmission.certificate1.url)
+        : Promise.resolve(),
+      file2 && existingSubmission?.certificate2?.publicId
+        ? deleteCertificate(existingSubmission.certificate2.publicId, existingSubmission.certificate2.url)
+        : Promise.resolve(),
+      file3 && existingSubmission?.certificate3?.publicId
+        ? deleteCertificate(existingSubmission.certificate3.publicId, existingSubmission.certificate3.url)
+        : Promise.resolve(),
+    ]);
 
-    // Handle Certificate 2
-    if (file2) {
-      if (existingSubmission?.certificate2?.publicId) {
-        await deleteCertificate(existingSubmission.certificate2.publicId, existingSubmission.certificate2.url);
-      }
-      cert2Result = await uploadFile(file2, 2);
-    }
+    // Upload all new certificates in parallel
+    const [up1, up2, up3] = await Promise.all([
+      file1 ? uploadFile(file1, 1) : existingSubmission?.certificate1,
+      file2 ? uploadFile(file2, 2) : existingSubmission?.certificate2,
+      file3 ? uploadFile(file3, 3) : existingSubmission?.certificate3,
+    ]);
 
-    // Handle Certificate 3 (Optional)
-    if (file3) {
-      if (existingSubmission?.certificate3?.publicId) {
-        await deleteCertificate(existingSubmission.certificate3.publicId, existingSubmission.certificate3.url);
-      }
-      cert3Result = await uploadFile(file3, 3);
-    }
+    cert1Result = up1;
+    cert2Result = up2;
+    cert3Result = up3;
 
     let submission;
     if (existingSubmission) {
       // Update existing submission
       existingSubmission.studentName = studentName;
+      existingSubmission.projectName = projectName ? projectName.trim() : undefined;
       existingSubmission.certificate1 = cert1Result;
       existingSubmission.certificate2 = cert2Result;
       existingSubmission.certificate3 = cert3Result;
@@ -165,6 +177,7 @@ export async function POST(req: Request) {
         formId,
         studentName,
         rollNumber: rollNumber.trim().toUpperCase(),
+        projectName: projectName ? projectName.trim() : undefined,
         certificate1: cert1Result,
         certificate2: cert2Result,
         certificate3: cert3Result,

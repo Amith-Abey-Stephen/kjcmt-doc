@@ -34,6 +34,11 @@ const SubmissionSchema = new mongoose.Schema({
     trim: true,
     uppercase: true,
   },
+  projectName: {
+    type: String,
+    required: false,
+    trim: true,
+  },
   certificate1: {
     type: FileSchema,
     required: true,

@@ -54,7 +54,8 @@ export async function POST(req: Request) {
     await logAction(
       "User Registered",
       `Faculty user "${name}" (${email}) registered with role "${role || "faculty"}" by admin ${session.user.email}`,
-      session.user.email || "Admin"
+      session.user.email || "Admin",
+      (session.user as any).id
     );
 
     // Return user without password

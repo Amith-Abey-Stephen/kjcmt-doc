@@ -1,19 +1,14 @@
 import dbConnect from "./db";
 import AuditLog from "./models/AuditLog";
 
-/**
- * Creates an entry in the system audit logs.
- * @param action Short name of the action (e.g. "Form Created")
- * @param details Detailed description of the event
- * @param performedBy Email of the user, or "Student (Public Form)"
- */
-export async function logAction(action: string, details: string, performedBy: string) {
+export async function logAction(action: string, details: string, performedBy: string, userId?: string) {
   try {
     await dbConnect();
     await AuditLog.create({
       action,
       details,
       performedBy: performedBy || "System",
+      userId: userId || undefined,
       timestamp: new Date(),
     });
   } catch (error) {

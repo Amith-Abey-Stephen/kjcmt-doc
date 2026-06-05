@@ -9,11 +9,17 @@ export async function GET() {
   try {
     await dbConnect();
     const session = await getServerSession(authOptions);
-    
+
     let forms;
     if (session?.user) {
-      // Faculty/Admin sees all forms
-      forms = await Form.find({}).sort({ createdAt: -1 });
+      const user = session.user as any;
+      if (user.role === "admin") {
+        // Admin sees all forms
+        forms = await Form.find({}).sort({ createdAt: -1 });
+      } else {
+        // Faculty sees only their own forms
+        forms = await Form.find({ createdBy: user.id }).sort({ createdAt: -1 });
+      }
     } else {
       // Unauthenticated sees active forms only
       forms = await Form.find({ status: "active" }).sort({ createdAt: -1 });
@@ -35,7 +41,20 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { title, description, department, batch, academicYear, deadline } = body;
+    const {
+      title,
+      description,
+      department,
+      batch,
+      academicYear,
+      deadline,
+      programmeName,
+      programmeCode,
+      projectType,
+      courseCode,
+      yearOfOffering,
+      placeOfProject,
+    } = body;
 
     if (!title || !department || !batch || !academicYear || !deadline) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -50,12 +69,19 @@ export async function POST(req: Request) {
       deadline: new Date(deadline),
       createdBy: (session.user as any).id,
       status: new Date(deadline) > new Date() ? "active" : "expired",
+      programmeName: programmeName || undefined,
+      programmeCode: programmeCode || undefined,
+      projectType: projectType || undefined,
+      courseCode: courseCode || undefined,
+      yearOfOffering: yearOfOffering || undefined,
+      placeOfProject: placeOfProject || undefined,
     });
 
     await logAction(
       "Form Created",
       `Form "${title}" (${batch} - ${department}) created by ${session.user.email}`,
-      session.user.email || "Faculty"
+      session.user.email || "Faculty",
+      (session.user as any).id
     );
 
     return NextResponse.json(form, { status: 201 });

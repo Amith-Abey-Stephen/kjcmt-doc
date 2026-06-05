@@ -34,6 +34,30 @@ const FormSchema = new mongoose.Schema({
     enum: ["active", "expired"],
     default: "active",
   },
+  programmeName: {
+    type: String,
+    trim: true,
+  },
+  programmeCode: {
+    type: String,
+    trim: true,
+  },
+  projectType: {
+    type: String,
+    trim: true,
+  },
+  courseCode: {
+    type: String,
+    trim: true,
+  },
+  yearOfOffering: {
+    type: String,
+    trim: true,
+  },
+  placeOfProject: {
+    type: String,
+    trim: true,
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",

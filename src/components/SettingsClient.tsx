@@ -13,6 +13,7 @@ import {
   AlertCircle,
   CheckCircle,
 } from "lucide-react";
+import { UserCardSkeleton, TimelineSkeleton } from "@/components/Skeleton";
 
 interface AuditLogItem {
   _id: string;
@@ -121,9 +122,13 @@ export default function SettingsClient() {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto pb-12">
+    <div className="space-y-8 max-w-5xl mx-auto pb-12 animate-in">
       {/* Top Header */}
       <div className="border-b border-zinc-900 pb-5">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-5 w-1 bg-purple-500 rounded-full" />
+          <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">Configuration</span>
+        </div>
         <h1 className="text-2xl font-bold tracking-tight text-white">Settings</h1>
         <p className="text-zinc-500 text-xs mt-1">
           Manage your faculty credentials and audit system security trails.
@@ -140,12 +145,12 @@ export default function SettingsClient() {
             </h3>
 
             <div className="space-y-3 pt-2">
-              <div className="flex flex-col items-center py-4 bg-zinc-950/40 border border-zinc-900/80 rounded-xl">
-                <div className="h-12 w-12 rounded-full bg-purple-600/10 border border-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-lg mb-2 shadow shadow-purple-600/5">
+              <div className="flex flex-col items-center py-6 bg-zinc-950/40 border border-zinc-900/80 rounded-xl group hover:border-purple-500/20 transition-all duration-300">
+                <div className="h-16 w-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center font-bold text-2xl mb-3 shadow-lg shadow-purple-600/20 group-hover:scale-105 transition-transform duration-300">
                   {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : "F"}
                 </div>
-                <h4 className="text-xs font-bold text-white">{session?.user?.name}</h4>
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 mt-1 bg-purple-500/10 text-purple-400 text-[8px] font-bold uppercase rounded border border-purple-500/20">
+                <h4 className="text-sm font-bold text-white">{session?.user?.name}</h4>
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 mt-2 bg-purple-500/10 text-purple-400 text-[8px] font-bold uppercase rounded-full border border-purple-500/20">
                   <Shield className="h-2.5 w-2.5" />
                   {(session?.user as any)?.role || "Faculty"}
                 </span>
@@ -254,9 +259,7 @@ export default function SettingsClient() {
                 </h4>
 
                 {loadingUsers ? (
-                  <div className="flex justify-center py-4">
-                    <Loader2 className="h-5 w-5 animate-spin text-purple-500" />
-                  </div>
+                  <UserCardSkeleton count={4} />
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-2">
                     {users.map((u) => (
@@ -300,8 +303,8 @@ export default function SettingsClient() {
             </div>
 
             {loadingLogs ? (
-              <div className="flex justify-center py-10">
-                <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
+              <div className="py-4">
+                <TimelineSkeleton count={5} />
               </div>
             ) : logs.length > 0 ? (
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-1">

@@ -57,9 +57,13 @@ export default function ExportCenterClient({ forms }: ExportCenterClientProps) {
   const selectedForm = forms.find((f) => f.id === selectedFormId);
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-12">
+    <div className="space-y-6 max-w-4xl mx-auto pb-12 animate-in">
       {/* Top Banner */}
       <div className="border-b border-zinc-900 pb-5">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-5 w-1 bg-purple-500 rounded-full" />
+          <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-500">Archive Builder</span>
+        </div>
         <h1 className="text-2xl font-bold tracking-tight text-white">Export Center</h1>
         <p className="text-zinc-500 text-xs mt-1">
           Compile and compress collected student certificates into accreditation-ready archives.

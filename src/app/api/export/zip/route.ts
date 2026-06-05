@@ -18,6 +18,7 @@ export async function GET(req: Request) {
       return new Response("Unauthorized", { status: 401 });
     }
 
+    const user = session.user as any;
     const { searchParams } = new URL(req.url);
     const formId = searchParams.get("formId");
     const exportType = searchParams.get("exportType") || "zip-bundle"; // zip-bundle | accreditation
@@ -30,6 +31,9 @@ export async function GET(req: Request) {
     const form = await Form.findById(formId);
     if (!form) {
       return new Response("Form not found", { status: 404 });
+    }
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return new Response("Unauthorized. You do not own this form.", { status: 403 });
     }
 
     const submissions = await Submission.find({ formId });
@@ -122,7 +126,8 @@ export async function GET(req: Request) {
     await logAction(
       "ZIP Export Generated",
       `ZIP bundle (${exportType}) generated for form "${form.title}" (${submissions.length} students, sorted by: ${sortMode})`,
-      session.user.email || "Faculty"
+      session.user.email || "Faculty",
+      user.id
     );
 
     return new Response(passThrough as any, {

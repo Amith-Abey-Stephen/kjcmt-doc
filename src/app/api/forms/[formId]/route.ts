@@ -12,10 +12,20 @@ export async function GET(req: Request, props: { params: Promise<{ formId: strin
   const params = await props.params;
   try {
     await dbConnect();
+    const session = await getServerSession(authOptions);
     const form = await Form.findById(params.formId);
     if (!form) {
       return NextResponse.json({ error: "Form not found" }, { status: 404 });
     }
+
+    // If authenticated, enforce ownership for non-admin users
+    if (session?.user) {
+      const user = session.user as any;
+      if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+        return NextResponse.json({ error: "Unauthorized. You do not own this form." }, { status: 403 });
+      }
+    }
+
     return NextResponse.json(form);
   } catch (error: any) {
     console.error("GET Form error:", error);
@@ -35,6 +45,11 @@ export async function DELETE(req: Request, props: { params: Promise<{ formId: st
     const form = await Form.findById(params.formId);
     if (!form) {
       return NextResponse.json({ error: "Form not found" }, { status: 404 });
+    }
+
+    const user = session.user as any;
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return NextResponse.json({ error: "Unauthorized. You do not own this form." }, { status: 403 });
     }
 
     // Find and delete all certificates uploaded for this form
@@ -63,7 +78,8 @@ export async function DELETE(req: Request, props: { params: Promise<{ formId: st
     await logAction(
       "Form Deleted",
       `Form "${form.title}" and all its related submissions/files were deleted by ${session.user.email}`,
-      session.user.email || "Faculty"
+      session.user.email || "Faculty",
+      (session.user as any).id
     );
 
     return NextResponse.json({ message: "Form deleted successfully" });

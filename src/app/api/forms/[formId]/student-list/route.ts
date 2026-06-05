@@ -16,6 +16,15 @@ export async function GET(req: Request, props: { params: Promise<{ formId: strin
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = session.user as any;
+    const form = await Form.findById(params.formId);
+    if (!form) {
+      return NextResponse.json({ error: "Form not found" }, { status: 404 });
+    }
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return NextResponse.json({ error: "Unauthorized. You do not own this form." }, { status: 403 });
+    }
+
     const students = await StudentList.find({ formId: params.formId }).sort({ rollNumber: 1 });
     return NextResponse.json(students);
   } catch (error: any) {
@@ -33,9 +42,13 @@ export async function POST(req: Request, props: { params: Promise<{ formId: stri
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = session.user as any;
     const form = await Form.findById(params.formId);
     if (!form) {
       return NextResponse.json({ error: "Form not found" }, { status: 404 });
+    }
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return NextResponse.json({ error: "Unauthorized. You do not own this form." }, { status: 403 });
     }
 
     const formData = await req.formData();
@@ -71,9 +84,9 @@ export async function POST(req: Request, props: { params: Promise<{ formId: stri
       }
     }
 
-    // Fallback if smart matching fails
-    if (!rollHeader && headers.length > 0) rollHeader = headers[0];
-    if (!nameHeader && headers.length > 1) nameHeader = headers[1];
+    // Fallback if smart matching fails — treat first column as Name, second as Roll Number
+    if (!nameHeader && headers.length > 0) nameHeader = headers[0];
+    if (!rollHeader && headers.length > 1) rollHeader = headers[1];
 
     if (!rollHeader || !nameHeader) {
       return NextResponse.json({ error: "Could not identify Roll Number or Student Name columns" }, { status: 400 });
@@ -100,12 +113,33 @@ export async function POST(req: Request, props: { params: Promise<{ formId: stri
       studentName: s.studentName,
       rollNumber: s.rollNumber,
     }));
+
+    // Check for duplicate roll numbers within the uploaded file
+    const seen = new Map<string, number[]>();
+    docs.forEach((d, i) => {
+      const existing = seen.get(d.rollNumber) || [];
+      existing.push(i + 1);
+      seen.set(d.rollNumber, existing);
+    });
+    const duplicates = Array.from(seen.entries()).filter(([, rows]) => rows.length > 1);
+    if (duplicates.length > 0) {
+      const fileName = file.name || "uploaded file";
+      const sheetName = workbook.SheetNames[0] || "Sheet1";
+      const dupMsg = duplicates
+        .map(([roll, rows]) => `"${roll}" (rows ${rows.join(", ")})`)
+        .join("; ");
+      return NextResponse.json({
+        error: `Duplicate roll numbers found in "${fileName}" (sheet: "${sheetName}"): ${dupMsg}. Each roll number must be unique.`
+      }, { status: 409 });
+    }
+
     await StudentList.insertMany(docs);
 
     await logAction(
       "Student List Uploaded",
       `Uploaded ${docs.length} students to form "${form.title}"`,
-      session.user.email || "Faculty"
+      session.user.email || "Faculty",
+      (session.user as any).id
     );
 
     return NextResponse.json({
@@ -114,6 +148,13 @@ export async function POST(req: Request, props: { params: Promise<{ formId: stri
     });
   } catch (error: any) {
     console.error("POST StudentList error:", error);
-    return NextResponse.json({ error: error.message || "Failed to process Excel file" }, { status: 500 });
+    if (error?.code === 11000) {
+      const dupField = Object.keys(error?.keyValue || {})[0];
+      const dupVal = error?.keyValue?.[dupField] || "a record";
+      return NextResponse.json({
+        error: `Duplicate entry: "${dupVal}" already exists. Each roll number must be unique within a form. Check your Excel file for duplicate rows.`
+      }, { status: 409 });
+    }
+    return NextResponse.json({ error: "Failed to process Excel file. Make sure it has the correct format (Name and Roll Number columns)." }, { status: 500 });
   }
 }

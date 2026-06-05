@@ -12,6 +12,13 @@ async function getFormsData() {
     title: f.title,
     department: f.department,
     batch: f.batch,
+    academicYear: f.academicYear,
+    programmeName: f.programmeName || "",
+    programmeCode: f.programmeCode || "",
+    projectType: f.projectType || "",
+    courseCode: f.courseCode || "",
+    yearOfOffering: f.yearOfOffering || "",
+    placeOfProject: f.placeOfProject || "",
   }));
 }
 

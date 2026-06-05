@@ -16,9 +16,10 @@ export async function GET(req: NextRequest) {
       return new Response("Unauthorized", { status: 401 });
     }
 
+    const user = session.user as any;
     const { searchParams } = new URL(req.url);
     const formId = searchParams.get("formId");
-    const reportType = searchParams.get("reportType") || "submission"; // submission | missing
+    const reportType = searchParams.get("reportType") || "submission"; // submission | missing | pending | naac
 
     if (!formId) {
       return new Response("formId is required", { status: 400 });
@@ -27,6 +28,9 @@ export async function GET(req: NextRequest) {
     const form = await Form.findById(formId);
     if (!form) {
       return new Response("Form not found", { status: 404 });
+    }
+    if (user.role !== "admin" && form.createdBy?.toString() !== user.id) {
+      return new Response("Unauthorized. You do not own this form.", { status: 403 });
     }
 
     const submissions = await Submission.find({ formId });
@@ -42,7 +46,9 @@ export async function GET(req: NextRequest) {
     workbook.created = new Date();
 
     const worksheet = workbook.addWorksheet(
-      reportType === "submission" ? "Submission Report" : "Missing File Report"
+      reportType === "submission" ? "Submission Report"
+      : reportType === "pending" ? "Pending List"
+      : "Missing File Report"
     );
 
     // Style helper definitions
@@ -71,6 +77,7 @@ export async function GET(req: NextRequest) {
       worksheet.columns = [
         { header: "Roll Number", key: "rollNumber", width: 15 },
         { header: "Student Name", key: "studentName", width: 25 },
+        { header: "Project Name", key: "projectName", width: 30 },
         { header: "Status", key: "status", width: 15 },
         { header: "Submitted At", key: "submittedAt", width: 25 },
       ];
@@ -97,6 +104,7 @@ export async function GET(req: NextRequest) {
         const row = worksheet.addRow({
           rollNumber: student.rollNumber,
           studentName: student.studentName,
+          projectName: sub ? (sub.projectName || "—") : "—",
           status: sub ? "Submitted" : "Pending",
           submittedAt: sub ? new Date(sub.submittedAt).toLocaleString() : "—",
         });
@@ -121,6 +129,7 @@ export async function GET(req: NextRequest) {
           const row = worksheet.addRow({
             rollNumber: sub.rollNumber,
             studentName: `${sub.studentName} (Unregistered)`,
+            projectName: sub.projectName || "—",
             status: "Submitted",
             submittedAt: new Date(sub.submittedAt).toLocaleString(),
           });
@@ -129,6 +138,152 @@ export async function GET(req: NextRequest) {
             cell.alignment = { vertical: "middle" };
           });
           row.getCell("status").font = { color: { argb: "FF15803D" }, bold: true };
+        }
+      });
+    } else if (reportType === "pending") {
+      // 2. PENDING LIST REPORT (only students who haven't submitted)
+      worksheet.columns = [
+        { header: "Roll Number", key: "rollNumber", width: 15 },
+        { header: "Student Name", key: "studentName", width: 25 },
+        { header: "Status", key: "status", width: 15 },
+      ];
+
+      const headerRow = worksheet.getRow(1);
+      headerRow.height = 25;
+      headerRow.eachCell((cell) => {
+        cell.font = headerStyle.font;
+        cell.fill = headerStyle.fill;
+        cell.alignment = headerStyle.alignment;
+        cell.border = headerStyle.border;
+      });
+
+      masterList.forEach((student) => {
+        const roll = student.rollNumber.toUpperCase();
+        if (submissionMap.has(roll)) return;
+
+        const row = worksheet.addRow({
+          rollNumber: student.rollNumber,
+          studentName: student.studentName,
+          status: "Pending",
+        });
+
+        row.eachCell((cell) => {
+          cell.border = borderStyle;
+          cell.alignment = { vertical: "middle" };
+        });
+
+        row.getCell("status").font = { color: { argb: "FFB45309" }, bold: true };
+      });
+    } else if (reportType === "naac") {
+      // 3. NAAC SPECIFIC EXPORT
+      const pName = searchParams.get("programmeName") || form.programmeName || form.department || "BCA";
+      const pCode = searchParams.get("programmeCode") || form.programmeCode || "BCA";
+      const projType = searchParams.get("projectType") || form.projectType || "Project/Field Work/Internship";
+      const cCode = searchParams.get("courseCode") || form.courseCode || "BCA601";
+      const yOffering = searchParams.get("yearOfOffering") || form.yearOfOffering || form.academicYear || "2025-2026";
+      const plProject = searchParams.get("placeOfProject") || form.placeOfProject || "Kristu Jyoti College of Management and Technology";
+
+      // Merging A1 to H2 for Title
+      worksheet.mergeCells("A1:H2");
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = "LIST OF STUDENTS UNDERTAKING THE FIELD PROJECTS/INTERNSHIP/PROGRAM-WISE IN THE LAST COMPLETED ACADEMIC YEAR ALONG WITH THE DETAILS OF TITLE, PLACE OF WORK ETC";
+      titleCell.font = { name: "Arial", size: 10, bold: true };
+      titleCell.alignment = { wrapText: true, horizontal: "center", vertical: "middle" };
+      titleCell.border = {
+        top: { style: "medium" },
+        left: { style: "medium" },
+        bottom: { style: "medium" },
+        right: { style: "medium" },
+      };
+
+      // Empty separator row 3
+      worksheet.addRow([]);
+
+      // Define NAAC Columns
+      worksheet.columns = [
+        { header: "Programme Name", key: "programmeName", width: 25 },
+        { header: "Programme Code", key: "programmeCode", width: 15 },
+        { header: "Project/Field Work/Internship", key: "projectType", width: 25 },
+        { header: "Course Code", key: "courseCode", width: 15 },
+        { header: "Year of Offering", key: "yearOfOffering", width: 18 },
+        { header: "Name of Student", key: "studentName", width: 28 },
+        { header: "Title of Project", key: "projectName", width: 35 },
+        { header: "Place of Project", key: "placeOfProject", width: 30 },
+      ];
+
+      // Format Table Headers at row 4
+      const naacHeaderRow = worksheet.getRow(4);
+      naacHeaderRow.height = 30;
+      naacHeaderRow.eachCell((cell) => {
+        cell.font = { name: "Arial", size: 10, bold: true };
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFF3F4F6" }, // Light grey background
+        };
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+
+      // Populate NAAC rows
+      const processedRolls = new Set<string>();
+
+      masterList.forEach((student) => {
+        const roll = student.rollNumber.toUpperCase();
+        processedRolls.add(roll);
+        const sub = submissionMap.get(roll);
+
+        const row = worksheet.addRow({
+          programmeName: pName,
+          programmeCode: pCode,
+          projectType: projType,
+          courseCode: cCode,
+          yearOfOffering: yOffering,
+          studentName: student.studentName,
+          projectName: sub ? (sub.projectName || "—") : "—",
+          placeOfProject: plProject,
+        });
+
+        row.eachCell((cell) => {
+          cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" },
+          };
+          cell.alignment = { vertical: "middle", wrapText: true };
+        });
+      });
+
+      // Add unregistered submissions
+      submissions.forEach((sub) => {
+        const roll = sub.rollNumber.toUpperCase();
+        if (!processedRolls.has(roll)) {
+          const row = worksheet.addRow({
+            programmeName: pName,
+            programmeCode: pCode,
+            projectType: projType,
+            courseCode: cCode,
+            yearOfOffering: yOffering,
+            studentName: `${sub.studentName} (Unregistered)`,
+            projectName: sub.projectName || "—",
+            placeOfProject: plProject,
+          });
+
+          row.eachCell((cell) => {
+            cell.border = {
+              top: { style: "thin" },
+              left: { style: "thin" },
+              bottom: { style: "thin" },
+              right: { style: "thin" },
+            };
+            cell.alignment = { vertical: "middle", wrapText: true };
+          });
         }
       });
     } else {
@@ -211,12 +366,17 @@ export async function GET(req: NextRequest) {
     await logAction(
       "Report Generated",
       `Excel report (${reportType}) downloaded for campaign "${form.title}"`,
-      session.user.email || "Faculty"
+      session.user.email || "Faculty",
+      user.id
     );
 
     const filename =
-      reportType === "submission"
+      reportType === "naac"
+        ? `${form.title.replace(/\s+/g, "_")}_NAAC_Project_Report.xlsx`
+        : reportType === "submission"
         ? `${form.title.replace(/\s+/g, "_")}_Submission_Report.xlsx`
+        : reportType === "pending"
+        ? `${form.title.replace(/\s+/g, "_")}_Pending_List.xlsx`
         : `${form.title.replace(/\s+/g, "_")}_Missing_Files_Report.xlsx`;
 
     return new Response(excelBuffer as any, {

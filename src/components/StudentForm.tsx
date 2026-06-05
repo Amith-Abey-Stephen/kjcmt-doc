@@ -239,7 +239,12 @@ export default function StudentForm({ form }: StudentFormProps) {
         body: formData,
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Submission failed. Files may be too large (max 10MB per file).");
+      }
       if (!res.ok) {
         throw new Error(data.error || "Submission failed. Please try again.");
       }

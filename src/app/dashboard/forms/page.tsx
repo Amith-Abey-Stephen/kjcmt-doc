@@ -22,7 +22,7 @@ async function getFormsData() {
         department: form.department,
         batch: form.batch,
         academicYear: form.academicYear,
-        deadline: form.deadline.toISOString(),
+        deadline: form.deadline ? form.deadline.toISOString() : "",
         status: form.status,
         createdAt: form.createdAt.toISOString(),
         submissionCount,

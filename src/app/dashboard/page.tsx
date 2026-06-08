@@ -308,7 +308,7 @@ export default async function DashboardPage() {
                       <span>{form.department} | {form.batch}</span>
                       <span className="flex items-center gap-1">
                         <Calendar className="h-3 w-3 text-zinc-600" />
-                        Deadline: {new Date(form.deadline).toLocaleDateString()}
+                        Deadline: {form.deadline ? new Date(form.deadline).toLocaleDateString() : "No deadline"}
                       </span>
                     </div>
                   </div>

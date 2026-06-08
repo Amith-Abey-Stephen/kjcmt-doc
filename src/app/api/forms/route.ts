@@ -62,7 +62,7 @@ export async function POST(req: Request) {
       askPlaceOfProject,
     } = body;
 
-    if (!title || !department || !batch || !academicYear || !deadline) {
+    if (!title || !department || !batch || !academicYear) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -72,9 +72,9 @@ export async function POST(req: Request) {
       department,
       batch,
       academicYear,
-      deadline: new Date(deadline),
+      deadline: deadline ? new Date(deadline) : undefined,
       createdBy: (session.user as any).id,
-      status: new Date(deadline) > new Date() ? "active" : "expired",
+      status: (deadline && new Date(deadline) < new Date()) ? "expired" : "active",
       programmeName: programmeName || undefined,
       programmeCode: programmeCode || undefined,
       projectType: projectType || undefined,

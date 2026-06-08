@@ -80,7 +80,7 @@ export async function POST(req: Request) {
     }
 
     const now = new Date();
-    if (new Date(form.deadline) < now) {
+    if (form.deadline && new Date(form.deadline) < now) {
       // Mark as expired if deadline passed
       if (form.status !== "expired") {
         form.status = "expired";

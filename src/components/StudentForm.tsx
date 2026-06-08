@@ -21,7 +21,7 @@ interface FormDetails {
   department: string;
   batch: string;
   academicYear: string;
-  deadline: string;
+  deadline?: string | null;
   programmeName?: string;
   programmeCode?: string;
   projectType?: string;
@@ -240,11 +240,16 @@ export default function StudentForm({ form }: StudentFormProps) {
       });
 
       let data;
+      const text = await res.text();
       try {
-        data = await res.json();
+        data = JSON.parse(text);
       } catch {
-        throw new Error("Submission failed. Files may be too large (max 10MB per file).");
+        if (res.status === 413) {
+          throw new Error("Submission failed: Uploaded files are too large (limit is 10MB per file).");
+        }
+        throw new Error(text || `Request failed with status code ${res.status}`);
       }
+
       if (!res.ok) {
         throw new Error(data.error || "Submission failed. Please try again.");
       }
@@ -271,10 +276,12 @@ export default function StudentForm({ form }: StudentFormProps) {
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 font-medium">
           <span>Dept: {form.department}</span>
           <span>Batch: {form.batch}</span>
-          <span className="flex items-center gap-1">
-            <Calendar className="h-3.5 w-3.5 text-zinc-600" />
-            Deadline: {new Date(form.deadline).toLocaleString()}
-          </span>
+          {form.deadline && (
+            <span className="flex items-center gap-1">
+              <Calendar className="h-3.5 w-3.5 text-zinc-600" />
+              Deadline: {new Date(form.deadline).toLocaleString()}
+            </span>
+          )}
         </div>
         {form.description && (
           <p className="text-zinc-500 text-xs leading-normal max-w-lg mx-auto pt-2">
@@ -359,6 +366,7 @@ export default function StudentForm({ form }: StudentFormProps) {
                   className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
                 />
               </div>
+              <p className="text-[10px] text-zinc-550 pl-1 leading-normal">Enter your official name as registered at college.</p>
             </div>
 
             <div className="space-y-1.5">
@@ -366,11 +374,12 @@ export default function StudentForm({ form }: StudentFormProps) {
               <input
                 type="text"
                 required
-                placeholder="e.g. BCA001"
+                placeholder="e.g. 230021080173"
                 value={rollNumber}
                 onChange={(e) => setRollNumber(e.target.value)}
                 className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
               />
+              <p className="text-[10px] text-zinc-550 pl-1 leading-normal">Your 12-digit university roll number (e.g. 230021080173).</p>
             </div>
           </div>
 
@@ -387,6 +396,7 @@ export default function StudentForm({ form }: StudentFormProps) {
               onChange={(e) => setProjectName(e.target.value)}
               className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
             />
+            <p className="text-[10px] text-zinc-550 pl-1 leading-normal">Write the official title of your project/internship/seminar.</p>
           </div>
 
           {/* Conditional NAAC student fields */}
@@ -523,7 +533,10 @@ export default function StudentForm({ form }: StudentFormProps) {
 
             {/* Cert 1 */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-400">Certificate Page 1 *</label>
+              <div className="flex flex-col gap-0.5">
+                <label className="text-xs font-semibold text-zinc-400">Certificate Page 1 *</label>
+                <span className="text-[9px] text-zinc-500">Upload the front side of your main certificate.</span>
+              </div>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-zinc-950/30 transition-all duration-200 cursor-pointer ${
                   dragOver1 ? "drop-zone-active border-purple-500 bg-purple-500/5" : "border-zinc-800 hover:border-zinc-700"
@@ -572,7 +585,10 @@ export default function StudentForm({ form }: StudentFormProps) {
 
             {/* Cert 2 */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-400">Certificate Page 2 *</label>
+              <div className="flex flex-col gap-0.5">
+                <label className="text-xs font-semibold text-zinc-400">Certificate Page 2 *</label>
+                <span className="text-[9px] text-zinc-500">Upload the syllabus page, grade/mark list, or certificate back side.</span>
+              </div>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-zinc-950/30 transition-all duration-200 cursor-pointer ${
                   dragOver2 ? "drop-zone-active border-purple-500 bg-purple-500/5" : "border-zinc-800 hover:border-zinc-700"
@@ -621,9 +637,12 @@ export default function StudentForm({ form }: StudentFormProps) {
 
             {/* Cert 3 (Optional) */}
             <div className="space-y-2">
-              <label className="text-xs font-semibold text-zinc-400">
-                Company Certificate <span className="text-zinc-500 font-medium">(Optional)</span>
-              </label>
+              <div className="flex flex-col gap-0.5">
+                <label className="text-xs font-semibold text-zinc-400">
+                  Company Certificate <span className="text-zinc-500 font-medium">(Optional)</span>
+                </label>
+                <span className="text-[9px] text-zinc-500">Upload company internship letter, project completion letter, or training certificate.</span>
+              </div>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-zinc-950/30 transition-all duration-200 cursor-pointer ${
                   dragOver3 ? "drop-zone-active border-purple-500 bg-purple-500/5" : "border-zinc-800 hover:border-zinc-700"

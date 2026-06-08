@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ArrowLeft, Loader2, Save, FileText, Calendar, Layers } from "lucide-react";
+import { ArrowLeft, Loader2, Save, FileText, Calendar, Layers, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 const formSchema = z.object({
@@ -14,7 +14,7 @@ const formSchema = z.object({
   department: z.string().min(2, "Department is required (e.g. BCA)"),
   batch: z.string().min(2, "Batch is required (e.g. 2026)"),
   academicYear: z.string().min(4, "Academic Year is required (e.g. 2023-2026)"),
-  deadline: z.string().refine((val) => !isNaN(Date.parse(val)), {
+  deadline: z.string().optional().refine((val) => !val || !isNaN(Date.parse(val)), {
     message: "Must be a valid date and time",
   }),
   programmeName: z.string().optional(),
@@ -90,7 +90,17 @@ export default function CreateFormPage() {
         body: JSON.stringify(submissionData),
       });
 
-      const json = await res.json();
+      let json;
+      const text = await res.text();
+      try {
+        json = JSON.parse(text);
+      } catch {
+        if (res.status === 413) {
+          throw new Error("Failed to create campaign: The request payload is too large.");
+        }
+        throw new Error(text || `Request failed with status code ${res.status}`);
+      }
+
       if (!res.ok) {
         throw new Error(json.error || "Failed to create form.");
       }
@@ -150,6 +160,17 @@ export default function CreateFormPage() {
             </div>
           )}
 
+          {/* Quick Guide Banner for Old Teachers/Non-Techies */}
+          <div className="p-4 rounded-xl bg-purple-950/20 border border-purple-900/40 text-xs text-purple-200 space-y-1.5">
+            <h4 className="font-bold flex items-center gap-1.5 text-purple-400">
+              <Sparkles className="h-4 w-4" />
+              Quick Guide for Teachers
+            </h4>
+            <p className="text-zinc-400 leading-relaxed text-[11px]">
+              Fill out this form to publish a new collection window. After saving, you will get a link to share with students and options to upload a class roster.
+            </p>
+          </div>
+
           {/* Form Title */}
           <div className="space-y-1.5">
             <label htmlFor="title" className="text-xs font-semibold text-zinc-400">
@@ -165,6 +186,7 @@ export default function CreateFormPage() {
                 className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
               />
             </div>
+            <p className="text-[10px] text-zinc-500 leading-normal pl-1">Give it a descriptive name (e.g. &quot;Software Project Submissions - BCA 2026&quot;).</p>
             {errors.title && (
               <p className="text-[10px] text-red-400 font-medium pl-1">{errors.title.message}</p>
             )}
@@ -182,6 +204,7 @@ export default function CreateFormPage() {
               {...register("description")}
               className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200 resize-none"
             />
+            <p className="text-[10px] text-zinc-500 leading-normal pl-1">Add details like instructions on file formatting or required certificates.</p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -200,6 +223,7 @@ export default function CreateFormPage() {
                   className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
                 />
               </div>
+              <p className="text-[10px] text-zinc-500 leading-normal pl-1">Course branch acronym (e.g. &quot;BCA&quot;, &quot;MCA&quot;).</p>
               {errors.department && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.department.message}</p>
               )}
@@ -217,6 +241,7 @@ export default function CreateFormPage() {
                 {...register("batch")}
                 className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
               />
+              <p className="text-[10px] text-zinc-500 leading-normal pl-1">The year the student batch finishes graduation.</p>
               {errors.batch && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.batch.message}</p>
               )}
@@ -234,6 +259,7 @@ export default function CreateFormPage() {
                 {...register("academicYear")}
                 className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
               />
+              <p className="text-[10px] text-zinc-500 leading-normal pl-1">The registration period for NAAC alignment.</p>
               {errors.academicYear && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.academicYear.message}</p>
               )}
@@ -242,7 +268,7 @@ export default function CreateFormPage() {
             {/* Submission Deadline */}
             <div className="space-y-1.5">
               <label htmlFor="deadline" className="text-xs font-semibold text-zinc-400">
-                Submission Deadline *
+                Submission Deadline (Optional)
               </label>
               <div className="relative">
                 <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
@@ -253,6 +279,7 @@ export default function CreateFormPage() {
                   className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
                 />
               </div>
+              <p className="text-[10px] text-zinc-500 leading-normal pl-1">Optional. The date and time after which student submissions will lock.</p>
               {errors.deadline && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.deadline.message}</p>
               )}

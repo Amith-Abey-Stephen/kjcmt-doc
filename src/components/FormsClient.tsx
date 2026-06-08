@@ -19,6 +19,7 @@ import {
   ExternalLink,
   ChevronRight,
   AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 
 interface FormItem {
@@ -28,7 +29,7 @@ interface FormItem {
   department: string;
   batch: string;
   academicYear: string;
-  deadline: string;
+  deadline?: string | null;
   status: string;
   createdAt: string;
   submissionCount: number;
@@ -53,6 +54,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
 
   const [activeDeleteFormId, setActiveDeleteFormId] = useState<string | null>(null);
   const [deletingForm, setDeletingForm] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
 
   // Copy share URL link to clipboard
   const handleCopyLink = (formId: string) => {
@@ -85,7 +87,17 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
         body: formData,
       });
 
-      const data = await res.json();
+      let data;
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch {
+        if (res.status === 413) {
+          throw new Error("Upload failed: The spreadsheet file is too large.");
+        }
+        throw new Error(text || `Request failed with status code ${res.status}`);
+      }
+
       if (!res.ok) {
         throw new Error(data.error || "Failed to process spreadsheet.");
       }
@@ -172,11 +184,61 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
         </Link>
       </div>
 
+      {/* Expandable Guide for non-techies/teachers */}
+      <div className="border border-zinc-900 rounded-2xl overflow-hidden bg-zinc-900/10">
+        <button
+          type="button"
+          onClick={() => setShowGuide(!showGuide)}
+          className="w-full flex items-center justify-between px-6 py-4 text-left text-xs font-bold text-purple-400 hover:text-purple-350 bg-zinc-900/20 hover:bg-zinc-900/40 transition duration-200"
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4 text-purple-500" />
+            <span>New to the platform? Quick 4-Step Guide for Teachers & Faculty</span>
+          </div>
+          <span className="text-zinc-500 font-mono text-[10px]">
+            {showGuide ? "Hide Guide [−]" : "Show Guide [+]"}
+          </span>
+        </button>
+
+        {showGuide && (
+          <div className="p-6 border-t border-zinc-900/60 bg-zinc-950/10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 animate-in">
+            <div className="space-y-1.5">
+              <div className="h-6 w-6 rounded-lg bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-[10px] font-black text-purple-400">1</div>
+              <h4 className="text-xs font-bold text-white">1. Create a Form</h4>
+              <p className="text-[11px] text-zinc-500 leading-normal">
+                Click <strong>&quot;Create Form&quot;</strong> and fill in the details. This gives you a public link for students to submit certificates.
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <div className="h-6 w-6 rounded-lg bg-green-500/10 border border-green-500/30 flex items-center justify-center text-[10px] font-black text-green-400">2</div>
+              <h4 className="text-xs font-bold text-white">2. Upload Student Register</h4>
+              <p className="text-[11px] text-zinc-500 leading-normal">
+                Click <strong>&quot;Upload Excel&quot;</strong> on your form card. Upload a class list to track who has or hasn&apos;t submitted.
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <div className="h-6 w-6 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-[10px] font-black text-blue-400">3</div>
+              <h4 className="text-xs font-bold text-white">3. Share the Link</h4>
+              <p className="text-[11px] text-zinc-500 leading-normal">
+                Click <strong>&quot;Copy Link&quot;</strong> on the form and share it in your student group (WhatsApp/Email) for them to upload.
+              </p>
+            </div>
+            <div className="space-y-1.5">
+              <div className="h-6 w-6 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-[10px] font-black text-indigo-400">4</div>
+              <h4 className="text-xs font-bold text-white">4. View Submissions & Export</h4>
+              <p className="text-[11px] text-zinc-500 leading-normal">
+                Click <strong>&quot;View Submissions&quot;</strong> to view uploaded PDFs, track pending uploads, or download compiled spreadsheets/ZIPs.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Forms Listing Grid */}
       {filteredForms.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredForms.map((form, idx) => {
-            const isExpired = new Date(form.deadline) < new Date();
+            const isExpired = form.deadline ? new Date(form.deadline) < new Date() : false;
             const expected = form.studentListCount;
             const progress = expected > 0 ? Math.round((form.submissionCount / expected) * 100) : 0;
 
@@ -239,7 +301,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
                 {/* Deadline Info */}
                 <div className="flex items-center gap-1.5 text-[10px] text-zinc-500 border-t border-zinc-900/60 pt-3 mb-4">
                   <Calendar className="h-3.5 w-3.5 text-zinc-600" />
-                  <span>Deadline: {new Date(form.deadline).toLocaleString()}</span>
+                  <span>Deadline: {form.deadline ? new Date(form.deadline).toLocaleString() : "No deadline set"}</span>
                 </div>
 
                 {/* Interactive Action Triggers */}

@@ -22,7 +22,7 @@ async function getFormData(formId: string) {
       department: form.department,
       batch: form.batch,
       academicYear: form.academicYear,
-      deadline: form.deadline.toISOString(),
+      deadline: form.deadline ? form.deadline.toISOString() : "",
       status: form.status,
       programmeName: form.programmeName || "",
       programmeCode: form.programmeCode || "",
@@ -65,7 +65,7 @@ export default async function StudentFormPage(props: StudentFormPageProps) {
     );
   }
 
-  const isExpired = new Date(form.deadline) < new Date();
+  const isExpired = form.deadline ? new Date(form.deadline) < new Date() : false;
 
   if (isExpired || form.status === "expired") {
     return (
@@ -80,7 +80,13 @@ export default async function StudentFormPage(props: StudentFormPageProps) {
           </div>
           <div className="p-3 rounded-xl bg-zinc-950/40 border border-zinc-900">
             <p className="text-xs text-zinc-500 leading-relaxed">
-              The submission window closed on <strong className="text-zinc-300">{new Date(form.deadline).toLocaleString()}</strong>. Late uploads are locked.
+              {form.deadline ? (
+                <>
+                  The submission window closed on <strong className="text-zinc-300">{new Date(form.deadline).toLocaleString()}</strong>. Late uploads are locked.
+                </>
+              ) : (
+                "The submission window has closed. Late uploads are locked."
+              )}
             </p>
           </div>
           <p className="text-xs text-zinc-500">Please contact your administrator.</p>

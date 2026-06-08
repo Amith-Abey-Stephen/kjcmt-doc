@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "KJCMT DOC - Certificate Tracking & Compilation",
+  title: "ProjCert - Certificate Tracking & Compilation",
   description: "Academically aligned, accreditation-ready certificate tracking, collection, and compilation platform for Kristu Jyoti College of Management and Technology.",
 };
 

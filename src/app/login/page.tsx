@@ -123,7 +123,7 @@ export default function LoginPage() {
           <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white mb-5 shadow-[0_0_25px_rgba(139,92,246,0.3)] pulse-glow">
             <Shield className="h-7 w-7" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">KJCMT DOC</h1>
+          <h1 className="text-4xl font-bold tracking-tight text-white bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">ProjCert</h1>
           <p className="mt-2 text-sm text-zinc-400">
             a service by Inovus Labs IEDC
           </p>

@@ -181,7 +181,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               KD
             </div>
             <div>
-              <span className="text-xl font-extrabold tracking-tight text-white">KJCMT DOC</span>
+              <span className="text-xl font-extrabold tracking-tight text-white">ProjCert</span>
               <p className="text-[9px] text-zinc-550 tracking-wider uppercase font-bold">by Inovus Labs IEDC</p>
             </div>
           </div>
@@ -256,7 +256,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             KD
           </div>
           <div>
-            <span className="text-md font-bold tracking-tight text-white">KJCMT DOC</span>
+            <span className="text-md font-bold tracking-tight text-white">ProjCert</span>
             <p className="text-[7px] text-zinc-600 uppercase tracking-wider">by Inovus Labs IEDC</p>
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <header className="hidden md:flex items-center justify-between h-16 border-b border-zinc-900 bg-zinc-950/40 backdrop-blur-xl px-8 sticky top-0 z-10">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-zinc-400 font-semibold">
-            <span className="text-zinc-500">KJCMT DOC</span>
+            <span className="text-zinc-500">ProjCert</span>
             <span className="text-zinc-700">/</span>
             <span className="text-zinc-200 font-bold">
               {sidebarLinks.find((l) => l.href === pathname)?.name || "Dashboard"}

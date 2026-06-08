@@ -214,6 +214,13 @@ export default function StudentForm({ form }: StudentFormProps) {
       return;
     }
 
+    const totalSize = (file1?.size || 0) + (file2?.size || 0) + (file3?.size || 0);
+    const maxTotalSize = 9.5 * 1024 * 1024; // 9.5MB (safely leaves ~500KB room for multipart headers and metadata)
+    if (totalSize > maxTotalSize) {
+      setError(`The combined size of all files (${(totalSize / (1024 * 1024)).toFixed(2)} MB) exceeds the 10 MB total server upload limit. Please compress your files (e.g. using an online PDF/image compressor) before submitting.`);
+      return;
+    }
+
     setLoading(true);
 
     const formData = new FormData();
@@ -250,7 +257,7 @@ export default function StudentForm({ form }: StudentFormProps) {
         data = JSON.parse(text);
       } catch {
         if (res.status === 413) {
-          throw new Error("Submission failed: Uploaded files are too large (limit is 10MB per file).");
+          throw new Error("Submission failed: The combined size of all uploaded files exceeds the 10MB total server upload limit. Please compress your files and try again.");
         }
         throw new Error(text || `Request failed with status code ${res.status}`);
       }

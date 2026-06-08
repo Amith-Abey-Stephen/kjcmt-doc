@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FileCheck,
@@ -42,6 +42,11 @@ interface StudentFormProps {
 
 export default function StudentForm({ form }: StudentFormProps) {
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Input states
   const [studentName, setStudentName] = useState("");
@@ -279,7 +284,7 @@ export default function StudentForm({ form }: StudentFormProps) {
           {form.deadline && (
             <span className="flex items-center gap-1">
               <Calendar className="h-3.5 w-3.5 text-zinc-600" />
-              Deadline: {new Date(form.deadline).toLocaleString()}
+              Deadline: {mounted ? new Date(form.deadline).toLocaleString() : "..."}
             </span>
           )}
         </div>

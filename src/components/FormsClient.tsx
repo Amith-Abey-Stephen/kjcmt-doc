@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -55,6 +55,11 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
   const [activeDeleteFormId, setActiveDeleteFormId] = useState<string | null>(null);
   const [deletingForm, setDeletingForm] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Copy share URL link to clipboard
   const handleCopyLink = (formId: string) => {
@@ -238,7 +243,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
       {filteredForms.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {filteredForms.map((form, idx) => {
-            const isExpired = form.deadline ? new Date(form.deadline) < new Date() : false;
+            const isExpired = mounted && form.deadline ? new Date(form.deadline) < new Date() : false;
             const expected = form.studentListCount;
             const progress = expected > 0 ? Math.round((form.submissionCount / expected) * 100) : 0;
 
@@ -301,7 +306,7 @@ export default function FormsClient({ initialForms }: FormsClientProps) {
                 {/* Deadline Info */}
                 <div className="flex items-center gap-2 text-xs text-zinc-400 border-t border-zinc-900/60 pt-3 mb-4 font-semibold">
                   <Calendar className="h-4 w-4 text-zinc-500" />
-                  <span>Deadline: {form.deadline ? new Date(form.deadline).toLocaleString() : "No deadline set"}</span>
+                  <span>Deadline: {mounted && form.deadline ? new Date(form.deadline).toLocaleString() : form.deadline ? "..." : "No deadline set"}</span>
                 </div>
 
                 {/* Interactive Action Triggers */}

@@ -48,6 +48,11 @@ export default function SettingsClient() {
   const [regLoading, setRegLoading] = useState(false);
   const [regError, setRegError] = useState("");
   const [regSuccess, setRegSuccess] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchLogs = useCallback(async () => {
     setLoadingLogs(true);
@@ -323,7 +328,7 @@ export default function SettingsClient() {
                       <p className="text-[10px] text-zinc-500 leading-normal">{log.details}</p>
                     </div>
                     <span className="text-[9px] text-zinc-600 font-mono text-right flex-shrink-0">
-                      {new Date(log.timestamp).toLocaleString()}
+                      {mounted ? new Date(log.timestamp).toLocaleString() : "..."}
                     </span>
                   </div>
                 ))}

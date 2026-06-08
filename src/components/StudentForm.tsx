@@ -36,6 +36,76 @@ interface FormDetails {
   askPlaceOfProject?: boolean;
 }
 
+const compressImageIfNeeded = (file: File): Promise<File> => {
+  return new Promise((resolve) => {
+    const isImage = ["image/jpeg", "image/png", "image/jpg"].includes(file.type.toLowerCase()) ||
+                    file.name.toLowerCase().endsWith(".jpg") ||
+                    file.name.toLowerCase().endsWith(".jpeg") ||
+                    file.name.toLowerCase().endsWith(".png");
+
+    if (!isImage) {
+      resolve(file);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        // Scale down if extremely large
+        const MAX_WIDTH = 1920;
+        const MAX_HEIGHT = 1920;
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+          if (width > height) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          } else {
+            width = Math.round((width * MAX_HEIGHT) / height);
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            const nameParts = file.name.split(".");
+            nameParts.pop();
+            const baseName = nameParts.join(".");
+            const compressedFile = new File([blob], `${baseName}_compressed.jpg`, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          },
+          "image/jpeg",
+          0.75
+        );
+      };
+      img.onerror = () => resolve(file);
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => resolve(file);
+    reader.readAsDataURL(file);
+  });
+};
+
 interface StudentFormProps {
   form: FormDetails;
 }
@@ -214,38 +284,44 @@ export default function StudentForm({ form }: StudentFormProps) {
       return;
     }
 
-    const totalSize = (file1?.size || 0) + (file2?.size || 0) + (file3?.size || 0);
-    const maxTotalSize = 9.5 * 1024 * 1024; // 9.5MB (safely leaves ~500KB room for multipart headers and metadata)
-    if (totalSize > maxTotalSize) {
-      setError(`The combined size of all files (${(totalSize / (1024 * 1024)).toFixed(2)} MB) exceeds the 10 MB total server upload limit. Please compress your files (e.g. using an online PDF/image compressor) before submitting.`);
-      return;
-    }
-
     setLoading(true);
 
-    const formData = new FormData();
-    formData.append("formId", form.id);
-    formData.append("studentName", studentName.trim());
-    formData.append("rollNumber", rollNumber.trim().toUpperCase());
-    if (projectName.trim()) {
-      formData.append("projectName", projectName.trim());
-    }
-    if (form.askProgrammeName) formData.append("programmeName", programmeName.trim());
-    if (form.askProgrammeCode) formData.append("programmeCode", programmeCode.trim());
-    if (form.askProjectType) {
-      formData.append("projectType", projectType === "Custom" ? customProjectType.trim() : projectType);
-    }
-    if (form.askCourseCode) formData.append("courseCode", courseCode.trim());
-    if (form.askYearOfOffering) formData.append("yearOfOffering", yearOfOffering.trim());
-    if (form.askPlaceOfProject) formData.append("placeOfProject", placeOfProject.trim());
-
-    formData.append("certificate1", file1);
-    formData.append("certificate2", file2);
-    if (file3) {
-      formData.append("certificate3", file3);
-    }
-
     try {
+      // Compress images on-the-fly to reduce network size
+      const compressedFile1 = await compressImageIfNeeded(file1);
+      const compressedFile2 = await compressImageIfNeeded(file2);
+      const compressedFile3 = file3 ? await compressImageIfNeeded(file3) : null;
+
+      const totalSize = compressedFile1.size + compressedFile2.size + (compressedFile3 ? compressedFile3.size : 0);
+      const maxTotalSize = 4.2 * 1024 * 1024; // 4.2MB (Vercel payload limit is 4.5MB total)
+      if (totalSize > maxTotalSize) {
+        setLoading(false);
+        setError(`The combined size of your files (${(totalSize / (1024 * 1024)).toFixed(2)} MB) exceeds the Vercel hosting upload limit of 4.5 MB. Please compress your PDF files before submitting.`);
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("formId", form.id);
+      formData.append("studentName", studentName.trim());
+      formData.append("rollNumber", rollNumber.trim().toUpperCase());
+      if (projectName.trim()) {
+        formData.append("projectName", projectName.trim());
+      }
+      if (form.askProgrammeName) formData.append("programmeName", programmeName.trim());
+      if (form.askProgrammeCode) formData.append("programmeCode", programmeCode.trim());
+      if (form.askProjectType) {
+        formData.append("projectType", projectType === "Custom" ? customProjectType.trim() : projectType);
+      }
+      if (form.askCourseCode) formData.append("courseCode", courseCode.trim());
+      if (form.askYearOfOffering) formData.append("yearOfOffering", yearOfOffering.trim());
+      if (form.askPlaceOfProject) formData.append("placeOfProject", placeOfProject.trim());
+
+      formData.append("certificate1", compressedFile1);
+      formData.append("certificate2", compressedFile2);
+      if (compressedFile3) {
+        formData.append("certificate3", compressedFile3);
+      }
+
       const res = await fetch("/api/submissions", {
         method: "POST",
         body: formData,
@@ -257,7 +333,7 @@ export default function StudentForm({ form }: StudentFormProps) {
         data = JSON.parse(text);
       } catch {
         if (res.status === 413) {
-          throw new Error("Submission failed: The combined size of all uploaded files exceeds the 10MB total server upload limit. Please compress your files and try again.");
+          throw new Error("Submission failed: The combined size of all uploaded files exceeds Vercel's 4.5MB total payload limit. Please compress your files and try again.");
         }
         throw new Error(text || `Request failed with status code ${res.status}`);
       }
@@ -403,7 +479,7 @@ export default function StudentForm({ form }: StudentFormProps) {
             <input
               type="text"
               required
-              placeholder="e.g. KJCMT DOC Certificate Tracking System"
+              placeholder="e.g. ProjCert Certificate Tracking System"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
               className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"

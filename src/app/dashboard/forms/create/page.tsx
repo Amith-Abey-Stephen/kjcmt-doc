@@ -172,29 +172,29 @@ export default function CreateFormPage() {
           </div>
 
           {/* Form Title */}
-          <div className="space-y-1.5">
-            <label htmlFor="title" className="text-xs font-semibold text-zinc-400">
+          <div className="space-y-2">
+            <label htmlFor="title" className="text-sm font-bold text-zinc-300">
               Form Campaign Title *
             </label>
             <div className="relative">
-              <FileText className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
               <input
                 id="title"
                 type="text"
                 placeholder="e.g. NPTEL Certificate Submission - BCA 2026"
                 {...register("title")}
-                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                className="w-full pl-11 pr-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
               />
             </div>
-            <p className="text-[10px] text-zinc-500 leading-normal pl-1">Give it a descriptive name (e.g. &quot;Software Project Submissions - BCA 2026&quot;).</p>
+            <p className="text-xs text-zinc-550 leading-normal pl-1">Give it a descriptive name (e.g. &quot;Software Project Submissions - BCA 2026&quot;).</p>
             {errors.title && (
               <p className="text-[10px] text-red-400 font-medium pl-1">{errors.title.message}</p>
             )}
           </div>
 
           {/* Description */}
-          <div className="space-y-1.5">
-            <label htmlFor="description" className="text-xs font-semibold text-zinc-400">
+          <div className="space-y-2">
+            <label htmlFor="description" className="text-sm font-bold text-zinc-300">
               Instruction / Description (Optional)
             </label>
             <textarea
@@ -202,36 +202,36 @@ export default function CreateFormPage() {
               rows={3}
               placeholder="Provide guidelines for students. E.g. Upload PDF files under 10MB only. Verify roll numbers before submitting."
               {...register("description")}
-              className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200 resize-none"
+              className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200 resize-none"
             />
-            <p className="text-[10px] text-zinc-500 leading-normal pl-1">Add details like instructions on file formatting or required certificates.</p>
+            <p className="text-xs text-zinc-550 leading-normal pl-1">Add details like instructions on file formatting or required certificates.</p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             {/* Department */}
-            <div className="space-y-1.5">
-              <label htmlFor="department" className="text-xs font-semibold text-zinc-400">
+            <div className="space-y-2">
+              <label htmlFor="department" className="text-sm font-bold text-zinc-300">
                 Department / Program *
               </label>
               <div className="relative">
-                <Layers className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Layers className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
                 <input
                   id="department"
                   type="text"
                   placeholder="e.g. BCA, BSc, BBA"
                   {...register("department")}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                  className="w-full pl-11 pr-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
                 />
               </div>
-              <p className="text-[10px] text-zinc-500 leading-normal pl-1">Course branch acronym (e.g. &quot;BCA&quot;, &quot;MCA&quot;).</p>
+              <p className="text-xs text-zinc-550 leading-normal pl-1">Course branch acronym (e.g. &quot;BCA&quot;, &quot;MCA&quot;).</p>
               {errors.department && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.department.message}</p>
               )}
             </div>
 
             {/* Batch */}
-            <div className="space-y-1.5">
-              <label htmlFor="batch" className="text-xs font-semibold text-zinc-400">
+            <div className="space-y-2">
+              <label htmlFor="batch" className="text-sm font-bold text-zinc-300">
                 Student Batch (Graduation Year) *
               </label>
               <input
@@ -239,17 +239,17 @@ export default function CreateFormPage() {
                 type="text"
                 placeholder="e.g. 2026"
                 {...register("batch")}
-                className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
               />
-              <p className="text-[10px] text-zinc-500 leading-normal pl-1">The year the student batch finishes graduation.</p>
+              <p className="text-xs text-zinc-550 leading-normal pl-1">The year the student batch finishes graduation.</p>
               {errors.batch && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.batch.message}</p>
               )}
             </div>
 
             {/* Academic Year */}
-            <div className="space-y-1.5">
-              <label htmlFor="academicYear" className="text-xs font-semibold text-zinc-400">
+            <div className="space-y-2">
+              <label htmlFor="academicYear" className="text-sm font-bold text-zinc-300">
                 Academic Year *
               </label>
               <input
@@ -257,29 +257,29 @@ export default function CreateFormPage() {
                 type="text"
                 placeholder="e.g. 2023-2026"
                 {...register("academicYear")}
-                className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
               />
-              <p className="text-[10px] text-zinc-500 leading-normal pl-1">The registration period for NAAC alignment.</p>
+              <p className="text-xs text-zinc-550 leading-normal pl-1">The registration period for NAAC alignment.</p>
               {errors.academicYear && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.academicYear.message}</p>
               )}
             </div>
 
             {/* Submission Deadline */}
-            <div className="space-y-1.5">
-              <label htmlFor="deadline" className="text-xs font-semibold text-zinc-400">
+            <div className="space-y-2">
+              <label htmlFor="deadline" className="text-sm font-bold text-zinc-300">
                 Submission Deadline (Optional)
               </label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <Calendar className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
                 <input
                   id="deadline"
                   type="datetime-local"
                   {...register("deadline")}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
+                  className="w-full pl-11 pr-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/30 transition duration-200"
                 />
               </div>
-              <p className="text-[10px] text-zinc-500 leading-normal pl-1">Optional. The date and time after which student submissions will lock.</p>
+              <p className="text-xs text-zinc-550 leading-normal pl-1">Optional. The date and time after which student submissions will lock.</p>
               {errors.deadline && (
                 <p className="text-[10px] text-red-400 font-medium pl-1">{errors.deadline.message}</p>
               )}
@@ -462,26 +462,26 @@ export default function CreateFormPage() {
             )}
           </div>
 
-          <div className="flex justify-end gap-3 pt-4 border-t border-zinc-900/60">
+          <div className="flex justify-end gap-4 pt-6 border-t border-zinc-900/60">
             <Link
               href="/dashboard/forms"
-              className="py-2.5 px-5 bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 rounded-xl text-sm text-zinc-400 hover:text-white transition duration-200 font-medium"
+              className="py-3.5 px-6 bg-zinc-950 hover:bg-zinc-900 border border-zinc-900 rounded-xl text-base text-zinc-300 hover:text-white transition duration-200 font-bold"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 py-2.5 px-6 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed rounded-xl text-sm font-semibold text-white transition duration-200 shadow-lg shadow-purple-600/10 active:translate-y-0.5"
+              className="inline-flex items-center gap-2 py-3.5 px-8 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed rounded-xl text-base font-extrabold text-white transition duration-200 shadow-lg shadow-purple-600/15 active:translate-y-0.5 cursor-pointer"
             >
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <Loader2 className="h-5 w-5 animate-spin" />
                   <span>Creating Campaign...</span>
                 </>
               ) : (
                 <>
-                  <Save className="h-4 w-4" />
+                  <Save className="h-5 w-5" />
                   <span>Publish Form</span>
                 </>
               )}

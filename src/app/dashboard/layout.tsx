@@ -176,13 +176,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <aside className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r border-zinc-900 bg-zinc-950/80 backdrop-blur-xl z-20">
         <div className="flex flex-col flex-grow pt-5 pb-4 overflow-y-auto">
           {/* Logo Branding */}
-          <div className="flex items-center px-6 mb-8 gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-sm shadow-lg shadow-purple-600/20">
+          <div className="flex items-center px-6 mb-8 gap-3.5">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-indigo-600 text-white font-bold text-base shadow-lg shadow-purple-600/20">
               KD
             </div>
             <div>
-              <span className="text-lg font-bold tracking-tight text-white">KJCMT DOC</span>
-              <p className="text-[8px] text-zinc-600 tracking-wider uppercase">by Inovus Labs IEDC</p>
+              <span className="text-xl font-extrabold tracking-tight text-white">KJCMT DOC</span>
+              <p className="text-[9px] text-zinc-550 tracking-wider uppercase font-bold">by Inovus Labs IEDC</p>
             </div>
           </div>
 
@@ -195,15 +195,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center px-4 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+                  className={`group flex items-center px-4 py-3 text-base font-bold rounded-xl transition-all duration-200 border-l-2 ${
                     isActive
-                      ? "bg-gradient-to-r from-purple-600/15 to-indigo-600/5 border-l-2 border-purple-500 text-white shadow-[inset_0_0_12px_rgba(139,92,246,0.06)]"
-                      : "text-zinc-400 hover:text-white hover:bg-zinc-900/60 hover:border-l-2 hover:border-zinc-700"
+                      ? "bg-gradient-to-r from-purple-600/15 to-indigo-600/5 border-purple-500 text-white shadow-[inset_0_0_12px_rgba(139,92,246,0.06)]"
+                      : "border-transparent text-zinc-400 hover:text-white hover:bg-zinc-900/60 hover:border-zinc-700"
                   }`}
                 >
                   <Icon
-                    className={`mr-3 h-4 w-4 flex-shrink-0 transition-all duration-200 ${
-                      isActive ? "text-purple-400 drop-shadow-[0_0_4px_rgba(139,92,246,0.3)]" : "text-zinc-500 group-hover:text-zinc-300"
+                    className={`mr-3.5 h-5 w-5 flex-shrink-0 transition-all duration-200 ${
+                      isActive ? "text-purple-400 drop-shadow-[0_0_4px_rgba(139,92,246,0.3)]" : "text-zinc-550 group-hover:text-zinc-300"
                     }`}
                   />
                   {item.name}
@@ -280,11 +280,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.name}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${
+                  className={`flex items-center px-4 py-3.5 text-base font-bold rounded-xl transition-all ${
                     isActive ? "bg-gradient-to-r from-purple-600/15 to-indigo-600/5 text-white border-l-2 border-purple-500" : "text-zinc-400 hover:text-white hover:bg-zinc-900/60"
                   }`}
                 >
-                  <Icon className="mr-3 h-4 w-4 text-purple-400" />
+                  <Icon className="mr-3.5 h-5 w-5 text-purple-400" />
                   {item.name}
                 </Link>
               );
@@ -305,10 +305,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* TOPBAR */}
         <header className="hidden md:flex items-center justify-between h-16 border-b border-zinc-900 bg-zinc-950/40 backdrop-blur-xl px-8 sticky top-0 z-10">
           {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-xs text-zinc-500">
-            <span className="text-zinc-600">KJCMT DOC</span>
-            <span className="text-zinc-800">/</span>
-            <span className="text-zinc-300 font-medium">
+          <div className="flex items-center gap-2 text-sm text-zinc-400 font-semibold">
+            <span className="text-zinc-500">KJCMT DOC</span>
+            <span className="text-zinc-700">/</span>
+            <span className="text-zinc-200 font-bold">
               {sidebarLinks.find((l) => l.href === pathname)?.name || "Dashboard"}
             </span>
           </div>

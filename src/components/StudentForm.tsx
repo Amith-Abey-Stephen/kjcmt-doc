@@ -353,39 +353,39 @@ export default function StudentForm({ form }: StudentFormProps) {
 
           {/* Identity fields */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-400">Student Name *</label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-zinc-300">Student Name *</label>
               <div className="relative">
-                <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <GraduationCap className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-zinc-500" />
                 <input
                   type="text"
                   required
                   placeholder="e.g. Amith Jose"
                   value={studentName}
                   onChange={(e) => setStudentName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
+                  className="w-full pl-11 pr-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
                 />
               </div>
-              <p className="text-[10px] text-zinc-550 pl-1 leading-normal">Enter your official name as registered at college.</p>
+              <p className="text-xs text-zinc-500 pl-1 leading-normal">Enter your official name as registered at college.</p>
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-zinc-400">Roll Number *</label>
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-zinc-300">Roll Number *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. 230021080173"
                 value={rollNumber}
                 onChange={(e) => setRollNumber(e.target.value)}
-                className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
+                className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
               />
-              <p className="text-[10px] text-zinc-550 pl-1 leading-normal">Your 12-digit university roll number (e.g. 230021080173).</p>
+              <p className="text-xs text-zinc-500 pl-1 leading-normal">Your 12-digit university roll number (e.g. 230021080173).</p>
             </div>
           </div>
 
           {/* Title of Project */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-zinc-400 flex items-center justify-between">
+          <div className="space-y-2">
+            <label className="text-sm font-bold text-zinc-300 flex items-center justify-between">
               <span>Title of Project *</span>
             </label>
             <input
@@ -394,9 +394,9 @@ export default function StudentForm({ form }: StudentFormProps) {
               placeholder="e.g. KJCMT DOC Certificate Tracking System"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              className="w-full px-4 py-2.5 bg-zinc-950/60 border border-zinc-900 rounded-xl text-sm text-white placeholder-zinc-700 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
+              className="w-full px-4 py-3 bg-zinc-950/60 border border-zinc-900 rounded-xl text-base text-white placeholder-zinc-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/20 transition"
             />
-            <p className="text-[10px] text-zinc-550 pl-1 leading-normal">Write the official title of your project/internship/seminar.</p>
+            <p className="text-xs text-zinc-500 pl-1 leading-normal">Write the official title of your project/internship/seminar.</p>
           </div>
 
           {/* Conditional NAAC student fields */}
@@ -534,8 +534,8 @@ export default function StudentForm({ form }: StudentFormProps) {
             {/* Cert 1 */}
             <div className="space-y-2">
               <div className="flex flex-col gap-0.5">
-                <label className="text-xs font-semibold text-zinc-400">Certificate Page 1 *</label>
-                <span className="text-[9px] text-zinc-500">Upload the front side of your main certificate.</span>
+                <label className="text-sm font-bold text-zinc-300">Certificate Page 1 *</label>
+                <span className="text-xs text-zinc-500">Upload the front side of your main certificate.</span>
               </div>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-zinc-950/30 transition-all duration-200 cursor-pointer ${
@@ -564,18 +564,18 @@ export default function StudentForm({ form }: StudentFormProps) {
                       <p className="text-xs font-semibold text-white truncate max-w-[250px]">{file1.name}</p>
                       <p className="text-[10px] text-zinc-500 mt-0.5">{Math.round(file1.size / 1024)} KB</p>
                     </div>
-                    <label htmlFor="cert-1" className="py-1 px-3 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 text-[10px] font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
+                    <label htmlFor="cert-1" className="py-2 px-4 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 text-xs font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
                       Change File
                     </label>
                   </>
                 ) : (
                   <>
-                    <UploadCloud className={`h-10 w-10 ${dragOver1 ? 'text-purple-400' : 'text-zinc-700'}`} />
+                    <UploadCloud className={`h-11 w-11 ${dragOver1 ? 'text-purple-400' : 'text-zinc-700'}`} />
                     <div className="text-center">
-                      <p className="text-xs font-semibold text-white">{dragOver1 ? 'Drop file here' : 'Drag & drop or click to upload'}</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">PDF or image file required (max 10MB)</p>
+                      <p className="text-sm font-bold text-white">{dragOver1 ? 'Drop file here' : 'Drag & drop or click to upload'}</p>
+                      <p className="text-xs text-zinc-500 mt-0.5">PDF or image file required (max 10MB)</p>
                     </div>
-                    <label htmlFor="cert-1" className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 hover:border-zinc-700 text-[10px] font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
+                    <label htmlFor="cert-1" className="py-2 px-4 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 hover:border-zinc-700 text-xs font-bold text-zinc-350 hover:text-white cursor-pointer transition select-none">
                       Choose File
                     </label>
                   </>
@@ -586,8 +586,8 @@ export default function StudentForm({ form }: StudentFormProps) {
             {/* Cert 2 */}
             <div className="space-y-2">
               <div className="flex flex-col gap-0.5">
-                <label className="text-xs font-semibold text-zinc-400">Certificate Page 2 *</label>
-                <span className="text-[9px] text-zinc-500">Upload the syllabus page, grade/mark list, or certificate back side.</span>
+                <label className="text-sm font-bold text-zinc-300">Certificate Page 2 *</label>
+                <span className="text-xs text-zinc-500">Upload the syllabus page, grade/mark list, or certificate back side.</span>
               </div>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-zinc-950/30 transition-all duration-200 cursor-pointer ${
@@ -616,18 +616,18 @@ export default function StudentForm({ form }: StudentFormProps) {
                       <p className="text-xs font-semibold text-white truncate max-w-[250px]">{file2.name}</p>
                       <p className="text-[10px] text-zinc-500 mt-0.5">{Math.round(file2.size / 1024)} KB</p>
                     </div>
-                    <label htmlFor="cert-2" className="py-1 px-3 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 text-[10px] font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
+                    <label htmlFor="cert-2" className="py-2 px-4 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 text-xs font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
                       Change File
                     </label>
                   </>
                 ) : (
                   <>
-                    <UploadCloud className={`h-10 w-10 ${dragOver2 ? 'text-purple-400' : 'text-zinc-700'}`} />
+                    <UploadCloud className={`h-11 w-11 ${dragOver2 ? 'text-purple-400' : 'text-zinc-700'}`} />
                     <div className="text-center">
-                      <p className="text-xs font-semibold text-white">{dragOver2 ? 'Drop file here' : 'Drag & drop or click to upload'}</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">PDF or image file required (max 10MB)</p>
+                      <p className="text-sm font-bold text-white">{dragOver2 ? 'Drop file here' : 'Drag & drop or click to upload'}</p>
+                      <p className="text-xs text-zinc-500 mt-0.5">PDF or image file required (max 10MB)</p>
                     </div>
-                    <label htmlFor="cert-2" className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 hover:border-zinc-700 text-[10px] font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
+                    <label htmlFor="cert-2" className="py-2 px-4 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 hover:border-zinc-700 text-xs font-bold text-zinc-350 hover:text-white cursor-pointer transition select-none">
                       Choose File
                     </label>
                   </>
@@ -638,10 +638,10 @@ export default function StudentForm({ form }: StudentFormProps) {
             {/* Cert 3 (Optional) */}
             <div className="space-y-2">
               <div className="flex flex-col gap-0.5">
-                <label className="text-xs font-semibold text-zinc-400">
+                <label className="text-sm font-bold text-zinc-300">
                   Company Certificate <span className="text-zinc-500 font-medium">(Optional)</span>
                 </label>
-                <span className="text-[9px] text-zinc-500">Upload company internship letter, project completion letter, or training certificate.</span>
+                <span className="text-xs text-zinc-500">Upload company internship letter, project completion letter, or training certificate.</span>
               </div>
               <div
                 className={`relative border-2 border-dashed rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-zinc-950/30 transition-all duration-200 cursor-pointer ${
@@ -670,18 +670,18 @@ export default function StudentForm({ form }: StudentFormProps) {
                       <p className="text-xs font-semibold text-white truncate max-w-[250px]">{file3.name}</p>
                       <p className="text-[10px] text-zinc-500 mt-0.5">{Math.round(file3.size / 1024)} KB</p>
                     </div>
-                    <label htmlFor="cert-3" className="py-1 px-3 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 text-[10px] font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
+                    <label htmlFor="cert-3" className="py-2 px-4 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 text-xs font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
                       Change File
                     </label>
                   </>
                 ) : (
                   <>
-                    <UploadCloud className={`h-10 w-10 ${dragOver3 ? 'text-purple-400' : 'text-zinc-700'}`} />
+                    <UploadCloud className={`h-11 w-11 ${dragOver3 ? 'text-purple-400' : 'text-zinc-700'}`} />
                     <div className="text-center">
-                      <p className="text-xs font-semibold text-white">{dragOver3 ? 'Drop file here' : 'Drag & drop or click to upload'}</p>
-                      <p className="text-[10px] text-zinc-500 mt-0.5">PDF or image optional (max 10MB)</p>
+                      <p className="text-sm font-bold text-white">{dragOver3 ? 'Drop file here' : 'Drag & drop or click to upload'}</p>
+                      <p className="text-xs text-zinc-500 mt-0.5">PDF or image optional (max 10MB)</p>
                     </div>
-                    <label htmlFor="cert-3" className="py-1.5 px-3 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 hover:border-zinc-700 text-[10px] font-bold text-zinc-400 hover:text-white cursor-pointer transition select-none">
+                    <label htmlFor="cert-3" className="py-2 px-4 bg-zinc-900 hover:bg-zinc-800 rounded-lg border border-zinc-800 hover:border-zinc-700 text-xs font-bold text-zinc-350 hover:text-white cursor-pointer transition select-none">
                       Choose File
                     </label>
                   </>
@@ -694,17 +694,17 @@ export default function StudentForm({ form }: StudentFormProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-bold rounded-xl text-sm transition duration-200 shadow-lg shadow-purple-600/10 active:translate-y-0.5"
+            className="w-full flex items-center justify-center gap-2.5 py-4 px-4 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-800 disabled:cursor-not-allowed text-white font-extrabold rounded-xl text-base transition duration-200 shadow-lg shadow-purple-600/15 active:translate-y-0.5 cursor-pointer"
           >
             {loading ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-5 w-5 animate-spin" />
                 <span>Uploading certificates...</span>
               </>
             ) : (
               <>
                 <span>Submit Certificates</span>
-                <Send className="h-4 w-4" />
+                <Send className="h-5 w-5" />
               </>
             )}
           </button>

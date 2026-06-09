@@ -50,15 +50,17 @@ export async function uploadCertificate(
   
   if (isCloudinaryConfigured) {
     try {
-      const isPdf = ext === "pdf";
       // Cloudinary upload using stream-promise wrapper
+      // We upload all assets (PDF and images) under resource_type: "image"
+      // to avoid raw file security restrictions (403 errors) on some Cloudinary accounts,
+      // and to enable automatic format handling/transformations.
       const result = await new Promise<any>((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           {
             folder: folderPath,
             public_id: filename,
-            resource_type: isPdf ? "raw" : "image",
-            format: !isPdf ? ext : "pdf",
+            resource_type: "image",
+            format: ext,
           },
           (error, result) => {
             if (error) reject(error);
@@ -74,7 +76,11 @@ export async function uploadCertificate(
       };
     } catch (error: any) {
       console.error("Cloudinary upload failed:", error);
-      throw new Error(`Cloudinary upload failed: ${error.message || error}`);
+      let errMsg = error.message || error;
+      if (typeof errMsg === "string" && errMsg.includes("403")) {
+        errMsg += " (This 403 error usually indicates incorrect API credentials in your environment variables, or that PDF uploads/delivery are restricted under 'Security' settings in your Cloudinary Dashboard. Please verify CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET on Vercel.)";
+      }
+      throw new Error(`Cloudinary upload failed: ${errMsg}`);
     }
   }
 
@@ -132,9 +138,9 @@ export async function deleteCertificate(publicId: string, url: string): Promise<
 
   if (isCloudinaryConfigured) {
     try {
-      const isPdf = url.toLowerCase().endsWith(".pdf");
+      const isRaw = url.includes("/raw/upload/");
       const result = await cloudinary.uploader.destroy(publicId, { 
-        resource_type: isPdf ? "raw" : "image" 
+        resource_type: isRaw ? "raw" : "image" 
       });
       return result.result === "ok";
     } catch (e) {

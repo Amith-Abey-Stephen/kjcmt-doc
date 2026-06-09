@@ -72,25 +72,44 @@ export async function uploadCertificate(
         url: result.secure_url,
         publicId: result.public_id,
       };
-    } catch (error) {
-      console.error("Cloudinary upload failed, falling back to local storage:", error);
+    } catch (error: any) {
+      console.error("Cloudinary upload failed:", error);
+      throw new Error(`Cloudinary upload failed: ${error.message || error}`);
     }
   }
 
-  // Local Storage Fallback
-  const localDir = path.join(process.cwd(), "public", "uploads", `form_${formId}`);
-  if (!fs.existsSync(localDir)) {
-    fs.mkdirSync(localDir, { recursive: true });
+  // Local Storage Fallback (only allowed in development)
+  const isServerlessOrProduction = 
+    process.env.NODE_ENV === "production" || 
+    process.env.VERCEL === "1" || 
+    !!process.env.LAMBDA_TASK_ROOT;
+
+  if (isServerlessOrProduction) {
+    throw new Error(
+      "Cloudinary media storage is not configured. Local file storage is not supported in production/serverless environments."
+    );
   }
 
-  const localPath = path.join(localDir, `${filename}.${ext}`);
-  fs.writeFileSync(localPath, fileBuffer);
+  try {
+    const localDir = path.join(process.cwd(), "public", "uploads", `form_${formId}`);
+    if (!fs.existsSync(localDir)) {
+      fs.mkdirSync(localDir, { recursive: true });
+    }
 
-  const relativeUrl = `/uploads/form_${formId}/${filename}.${ext}`;
-  return {
-    url: relativeUrl,
-    publicId: `local/form_${formId}/${filename}`,
-  };
+    const localPath = path.join(localDir, `${filename}.${ext}`);
+    fs.writeFileSync(localPath, fileBuffer);
+
+    const relativeUrl = `/uploads/form_${formId}/${filename}.${ext}`;
+    return {
+      url: relativeUrl,
+      publicId: `local/form_${formId}/${filename}`,
+    };
+  } catch (err: any) {
+    console.error("Local storage fallback failed:", err);
+    throw new Error(
+      `Failed to save file to local storage: ${err.message}. If you are running on Vercel or a serverless platform, you must configure Cloudinary environment variables (CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) for file uploads to work.`
+    );
+  }
 }
 
 /**
